@@ -1,4 +1,6 @@
+import { PATH } from '@/config'
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 export const Header = () => {
     return (
@@ -112,10 +114,10 @@ export const Header = () => {
                             {/* Nav */}
                             <ul className="navbar-nav mx-auto">
                                 <li className="nav-item">
-                                    <a className="nav-link" href="./">Trang chủ</a>
+                                    <Link className="nav-link" to={PATH.Home}>Trang chủ</Link>
                                 </li>
                                 <li className="nav-item">
-                                    <a className="nav-link" href="./shop.html">Sản phẩm</a>
+                                    <Link className="nav-link" to={PATH.Product}>Sản phẩm</Link>
                                 </li>
                                 <li className="nav-item dropdown">
                                     <a className="nav-link" href="./shop.html">Laptop</a>

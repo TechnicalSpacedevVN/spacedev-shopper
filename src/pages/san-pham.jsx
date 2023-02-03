@@ -11,8 +11,8 @@ export const ProductPage = () => {
 
     const { data, loading } = useQuery({
         queryKey: [currentPage],
-        keepPrivousData: true,
-        queryFn: () => productService.getProduct(`?fields=rating_average,review_count,name,real_price,price,categories,slug,id,images,discount_rate&page=${currentPage}`)
+        keepPrevousData: true,
+        queryFn: ({ signal }) => productService.getProduct(`?fields=rating_average,review_count,name,real_price,price,categories,slug,id,images,discount_rate&page=${currentPage}`, signal)
     })
 
     // if(loading) return null

@@ -15,7 +15,7 @@ export const useQuery = ({
     dependencyList = [],
     enabled = true,
     cacheTime,
-    keepPrivousData = false,
+    keepPrevousData = false,
     storeDriver = 'localStorage'
 } = {}) => {
 
@@ -30,12 +30,19 @@ export const useQuery = ({
     const [status, setStatus] = useState('idle')
 
     const cacheName = Array.isArray(queryKey) ? queryKey[0] : queryKey
+    const controllerRef = useRef(new AbortController())
 
     // useEffect(() => {
     //     if (typeof refetchRef.current === 'boolean') {
     //         refetchRef.current = true
     //     }
     // }, dependencyList)
+
+    useEffect(() => {
+        return () => {
+            controllerRef.current.abort()
+        }
+    }, [])
 
     useEffect(() => {
         if (enabled) {
@@ -46,7 +53,7 @@ export const useQuery = ({
 
     const getCacheDataOrPrivousData = async () => {
 
-        if (keepPrivousData && dataRef[cacheName]) {
+        if (keepPrevousData && dataRef[cacheName]) {
             return dataRef[cacheName]
         }
 
@@ -58,21 +65,24 @@ export const useQuery = ({
     }
 
     const setCacheDataOrPrivousData = (data) => {
-        if (keepPrivousData) {
+        if (keepPrevousData) {
             dataRef[cacheName] = data
         }
 
-        if (cacheName) {
+        if (cacheName && cacheTime) {
             let expired = cacheTime
             if (cacheTime) {
                 expired += Date.now()
             }
-            cache.set(cacheName, res, expired)
+            cache.set(cacheName, data, expired)
         }
     }
 
 
     const fetchData = async () => {
+        controllerRef.current.abort()
+        controllerRef.current = new AbortController()
+
         try {
             setLoading(true)
             setStatus('pending')
@@ -80,7 +90,7 @@ export const useQuery = ({
             let res = await getCacheDataOrPrivousData()
 
             if (!res) {
-                res = await queryFn()
+                res = await queryFn({ signal: controllerRef.current.signal })
             }
 
             setStatus('success')
@@ -89,13 +99,19 @@ export const useQuery = ({
             setCacheDataOrPrivousData(res)
 
             refetchRef.current = false
-        } catch (err) {
-            setError(err)
-            setStatus('error')
-        }
-        finally {
             setLoading(false)
+        } catch (err) {
+            console.log(err)
+            if (err instanceof CanceledError) {
+
+            } else {
+                setError(err)
+                setStatus('error')
+                setLoading(false)
+            }
+
         }
+
     }
     return {
         loading,

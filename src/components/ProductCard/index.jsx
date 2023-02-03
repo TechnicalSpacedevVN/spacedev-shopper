@@ -73,7 +73,7 @@ export const ProductCard = ({ images, rating_average, review_count, name, price,
                                 <span className="text-primary sale">{currency(real_price)}</span>
                                 <span className="font-size-xs text-gray-350 text-decoration-line-through ml-1">{currency(price)}</span>
                             </> :
-                                <span className="font-size-xs text-gray-350 text-decoration-line-through ml-1">{currency(real_price)}</span>
+                                <span className="text-xl flex h-full items-end">{currency(real_price)}</span>
                         }
 
                     </div>
