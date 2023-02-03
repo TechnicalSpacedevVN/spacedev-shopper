@@ -1,4 +1,4 @@
-import { authService } from "@/services/auth.service"
+import { authService } from "@/services/auth"
 import axios from "axios"
 import { getToken, setToken } from "../utils/token"
 
