@@ -1,10 +1,12 @@
 import { currency } from "@/utils"
 import { Skeleton } from "../Skeleton"
+import { useCategory } from "@/hooks/useCategories"
 
-export const ProductCard = ({ images, rating_average, review_count, name, price, real_price, slug, discount_rate }) => {
+export const ProductCard = ({ images, categories, rating_average, review_count, name, price, real_price, slug, discount_rate }) => {
 
     const img1 = images?.[0]?.thumbnail_url
     const img2 = images?.[1] ? images?.[1]?.thumbnail_url : img1
+    const category = useCategory(categories)
 
     return (
         <div className="col-6 col-md-4">
@@ -45,7 +47,10 @@ export const ProductCard = ({ images, rating_average, review_count, name, price,
                 <div className="card-body px-0">
                     {/* Category */}
                     <div className="card-product-category font-size-xs">
-                        <a className="text-muted" href="shop.html">Shoes</a>
+                        {
+                            category && <a className="text-muted" href="shop.html">{category.title}</a>
+                        }
+                        
                     </div>
                     {/* Title */}
                     <div className="card-product-title font-weight-bold">

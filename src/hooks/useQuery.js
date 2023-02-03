@@ -9,6 +9,10 @@ const _cache = {
 }
 
 
+const _asyncFunction = {
+    // key: Promise
+}
+
 export const useQuery = ({
     queryFn,
     queryKey,
@@ -31,7 +35,6 @@ export const useQuery = ({
 
     const cacheName = Array.isArray(queryKey) ? queryKey[0] : queryKey
     const controllerRef = useRef(new AbortController())
-
     // useEffect(() => {
     //     if (typeof refetchRef.current === 'boolean') {
     //         refetchRef.current = true
@@ -51,15 +54,20 @@ export const useQuery = ({
     }, [enabled].concat(queryKey))
 
 
-    const getCacheDataOrPrivousData = async () => {
+    const getCacheDataOrPrivousData = () => {
 
-        if (keepPrevousData && dataRef[cacheName]) {
-            return dataRef[cacheName]
-        }
+        if (cacheName) {
+            if (keepPrevousData && dataRef[cacheName]) {
+                return dataRef[cacheName]
+            }
 
-        // Kiểm tra cache xem có dữ liệu hay không
-        if (queryKey && !refetchRef.current) {
+            if (_asyncFunction[cacheName]) {
+                return _asyncFunction[cacheName]
+            }
+
+            // Kiểm tra cache xem có dữ liệu hay không
             return cache.get(queryKey)
+           
         }
 
     }
@@ -87,10 +95,17 @@ export const useQuery = ({
             setLoading(true)
             setStatus('pending')
 
-            let res = await getCacheDataOrPrivousData()
+            let res = getCacheDataOrPrivousData()
 
             if (!res) {
-                res = await queryFn({ signal: controllerRef.current.signal })
+                res = queryFn({ signal: controllerRef.current.signal })
+                if(cacheName) {
+                    _asyncFunction[cacheName] = res
+                }
+            }
+
+            if(res instanceof Promise) {
+                res = await res
             }
 
             setStatus('success')

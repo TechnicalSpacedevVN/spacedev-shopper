@@ -24,18 +24,18 @@ export const Header = () => {
                                 <li className="nav-item dropdown">
                                     {/* Toggle */}
                                     <a className="nav-link dropdown-toggle" data-toggle="dropdown" href="#">
-                                        <img className="mb-1 mr-1" src="./img/flags/usa.svg" alt="..." /> United States
+                                        <img className="mb-1 mr-1" src="/img/flags/usa.svg" alt="..." /> United States
                                     </a>
                                     {/* Menu */}
                                     <div className="dropdown-menu minw-0">
                                         <a className="dropdown-item" href="#!">
-                                            <img className="mb-1 mr-2" src="./img/flags/usa.svg" alt="USA" />United States
+                                            <img className="mb-1 mr-2" src="/img/flags/usa.svg" alt="USA" />United States
                                         </a>
                                         <a className="dropdown-item" href="#!">
-                                            <img className="mb-1 mr-2" src="./img/flags/canada.svg" alt="Canada" />Canada
+                                            <img className="mb-1 mr-2" src="/img/flags/canada.svg" alt="Canada" />Canada
                                         </a>
                                         <a className="dropdown-item" href="#!">
-                                            <img className="mb-1 mr-2" src="./img/flags/germany.svg" alt="Germany" />Germany
+                                            <img className="mb-1 mr-2" src="/img/flags/germany.svg" alt="Germany" />Germany
                                         </a>
                                     </div>
                                 </li>
@@ -102,7 +102,7 @@ export const Header = () => {
                     <div className="container">
                         {/* Brand */}
                         <a className="navbar-brand" href="./index.html">
-                            <img style={{ width: 50 }} src="./img/logo.svg" />
+                            <img style={{ width: 50 }} src="/img/logo.svg" />
                             Shopper.
                         </a>
                         {/* Toggler */}
