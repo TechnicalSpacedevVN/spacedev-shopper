@@ -16,12 +16,13 @@ export const ProductPage = () => {
 
     const [search] = useSearchParams()
     const currentPage = parseInt(search.get('page') || 1)
-
+    const searchProduct = search.get('search')
 
     const qs = queryString.stringify({
         page: currentPage,
         fields: 'rating_average,review_count,name,real_price,price,categories,slug,id,images,discount_rate',
-        categories: id
+        categories: id,
+        name: searchProduct
     })
 
 
@@ -227,7 +228,10 @@ export const ProductPage = () => {
                                 </select>
                             </div>
                         </div>
-                        <h4 className="mb-5 text-2xl">Searching for `Clothing`</h4>
+                        {
+                            searchProduct && <h4 className="mb-5 text-2xl">Searching for `{searchProduct}`</h4>
+                        }
+                        
                         {/* Products */}
                         <div className="row">
 

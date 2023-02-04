@@ -29,7 +29,7 @@ export const useQuery = ({
     const refetchRef = useRef()
 
     const [data, setData] = useState()
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(enabled)
     const [error, setError] = useState()
     const [status, setStatus] = useState('idle')
 
@@ -132,6 +132,7 @@ export const useQuery = ({
         loading,
         error,
         data,
-        status
+        status,
+        refetch: fetchData
     }
 }
