@@ -9,20 +9,30 @@ import React from 'react'
 import { Link, generatePath, useParams, useSearchParams } from 'react-router-dom'
 import queryString from 'query-string'
 import { useCategories } from '@/hooks/useCategories'
+import { useSearch } from '@/hooks/useSearch'
 
 export const ProductPage = () => {
 
     const { id } = useParams()
 
-    const [search] = useSearchParams()
-    const currentPage = parseInt(search.get('page') || 1)
-    const searchProduct = search.get('search')
+    // const [search, setSearch] = useSearchParams()
+
+    const [search, setSearch] = useSearch({
+        page: 1,
+        sort: 'newest'
+    })
+
+    // const currentPage = parseInt(search.get('page') || 1)
+    const searchProduct = search.search
+
+    const sort = search.sort
 
     const qs = queryString.stringify({
-        page: currentPage,
+        page: search.page,
         fields: 'rating_average,review_count,name,real_price,price,categories,slug,id,images,discount_rate',
         categories: id,
-        name: searchProduct
+        name: searchProduct,
+        sort
     })
 
 
@@ -218,13 +228,18 @@ export const ProductPage = () => {
                             <div className="col-12 col-md-auto flex gap-1 items-center whitespace-nowrap">
                                 {/* Select */}
                                 Sắp xếp theo:
-                                <select className="custom-select custom-select-xs">
-                                    <option>Mới nhất</option>
-                                    <option>Giá giảm dần</option>
-                                    <option>Giá tăng dần</option>
-                                    <option>Giảm giá nhiều nhất</option>
-                                    <option>Đánh giá cao nhất</option>
-                                    <option>Mua nhiều nhất</option>
+                                <select value={sort} onChange={ev => {
+                                    setSearch({
+                                        sort: ev.target.value,
+                                        page: 1
+                                    })
+                                }} className="custom-select custom-select-xs">
+                                    <option value="newest">Mới nhất</option>
+                                    <option value="real_price.desc">Giá giảm dần</option>
+                                    <option value="real_price.asc">Giá tăng dần</option>
+                                    <option value="discount_rate.desc">Giảm giá nhiều nhất</option>
+                                    <option value="rating_average.desc">Đánh giá cao nhất</option>
+                                    <option value="top_sell">Mua nhiều nhất</option>
                                 </select>
                             </div>
                         </div>
