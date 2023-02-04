@@ -5,34 +5,40 @@ import { PATH } from '@/config'
 import { useQuery } from '@/hooks/useQuery'
 import { productService } from '@/services/product'
 import { cn, slugify } from '@/utils'
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Link, generatePath, useParams, useSearchParams } from 'react-router-dom'
 import queryString from 'query-string'
 import { useCategories } from '@/hooks/useCategories'
 import { useSearch } from '@/hooks/useSearch'
+import { useDidUpdateEffect } from '@/hooks/useDidUpdateEffect'
 
 export const ProductPage = () => {
 
     const { id } = useParams()
-
-    // const [search, setSearch] = useSearchParams()
 
     const [search, setSearch] = useSearch({
         page: 1,
         sort: 'newest'
     })
 
-    // const currentPage = parseInt(search.get('page') || 1)
-    const searchProduct = search.search
+    const [minPrice, setMinPrice] = useState(search.minPrice)
+    const [maxPrice, setMaxPrice] = useState(search.maxPrice)
 
-    const sort = search.sort
+    // Bỏ qua lần đầu tiên render
+    useDidUpdateEffect(() => {
+        setMinPrice('')
+        setMaxPrice('')
+    }, [id])
+    console.log(minPrice)
 
     const qs = queryString.stringify({
         page: search.page,
         fields: 'rating_average,review_count,name,real_price,price,categories,slug,id,images,discount_rate',
         categories: id,
-        name: searchProduct,
-        sort
+        name: search.search,
+        sort: search.sort,
+        minPrice: search.minPrice,
+        maxPrice: search.maxPrice
     })
 
 
@@ -50,7 +56,7 @@ export const ProductPage = () => {
                 <div className="row">
                     <div className="col-12 col-md-4 col-lg-3">
                         {/* Filters */}
-                        <form className="mb-10 mb-md-0">
+                        <div className="mb-10 mb-md-0">
                             <ul className="nav nav-vertical" id="filterNav">
                                 <li className="nav-item">
                                     {/* Toggle */}
@@ -147,17 +153,22 @@ export const ProductPage = () => {
                                         {/* Range */}
                                         <div className="d-flex align-items-center">
                                             {/* Input */}
-                                            <input type="number" className="form-control form-control-xs" placeholder="$10.00" min={10} />
+                                            <input value={minPrice} onChange={(ev) => setMinPrice(ev.target.value)} type="number" className="form-control form-control-xs" placeholder="$10.00" min={10} />
                                             {/* Divider */}
                                             <div className="text-gray-350 mx-2">‒</div>
                                             {/* Input */}
-                                            <input type="number" className="form-control form-control-xs" placeholder="$350.00" max={350} />
+                                            <input value={maxPrice} onChange={ev => setMaxPrice(ev.target.value)} type="number" className="form-control form-control-xs" placeholder="$350.00" max={350} />
                                         </div>
-                                        <button className="btn btn-outline-dark btn-block mt-5">Apply</button>
+                                        <button onClick={() => {
+                                            setSearch({
+                                                minPrice,
+                                                maxPrice
+                                            })
+                                        }} className="btn btn-outline-dark btn-block mt-5">Apply</button>
                                     </div>
                                 </li>
                             </ul>
-                        </form>
+                        </div>
                     </div>
                     <div className="col-12 col-md-8 col-lg-9">
                         {/* <div className="flickity-page-dots-inner mb-9" data-flickity="{&quot;pageDots&quot;: true}">
@@ -228,7 +239,7 @@ export const ProductPage = () => {
                             <div className="col-12 col-md-auto flex gap-1 items-center whitespace-nowrap">
                                 {/* Select */}
                                 Sắp xếp theo:
-                                <select value={sort} onChange={ev => {
+                                <select value={search.sort} onChange={ev => {
                                     setSearch({
                                         sort: ev.target.value,
                                         page: 1
@@ -244,9 +255,9 @@ export const ProductPage = () => {
                             </div>
                         </div>
                         {
-                            searchProduct && <h4 className="mb-5 text-2xl">Searching for `{searchProduct}`</h4>
+                            search.search && <h4 className="mb-5 text-2xl">Searching for `{search.search}`</h4>
                         }
-                        
+
                         {/* Products */}
                         <div className="row">
 
