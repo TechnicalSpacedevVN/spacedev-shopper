@@ -1,14 +1,23 @@
 import { Button } from '@/components/Button'
 import { Field } from '@/components/Field'
+import { useAuth } from '@/hooks/useAuth'
 import { useBodyClass } from '@/hooks/useBodyClass'
 import { useForm } from '@/hooks/useForm'
 import { useQuery } from '@/hooks/useQuery'
+import { useSearch } from '@/hooks/useSearch'
+import { authService } from '@/services/auth'
 import { userService } from '@/services/user'
-import { regexp, required, confirm, handleError } from '@/utils'
+import { loginAction, loginByCodeAction } from '@/stories/auth'
+import { regexp, required, confirm, handleError, copyToClipboard } from '@/utils'
 import { message } from 'antd'
+import { useEffect } from 'react'
+import { useDispatch } from 'react-redux'
 
 export const Account = () => {
     useBodyClass('bg-light')
+    const [search] = useSearch()
+    const dispatch = useDispatch()
+    const { loginLoading } = useAuth()
     const { loading, refetch: registerService } = useQuery({
         enabled: false,
         queryFn: () => userService.register({
@@ -16,6 +25,30 @@ export const Account = () => {
             redirect: window.location.origin + window.location.pathname
         }),
         limitDuration: 1000
+    })
+
+    useEffect(() => {
+        if (search.code) {
+            dispatch(loginByCodeAction(search.code))
+        }
+    }, [])
+
+    // const { loading: loginLoading, refetch: loginService } = useQuery({
+    //     enabled: false,
+    //     queryFn: () => authService.login(formLogin.values),
+    //     limitDuration: 1000
+    // })
+
+
+
+    const formLogin = useForm({
+        username: [
+            required(),
+            regexp('email')
+        ],
+        password: [
+            required(),
+        ]
     })
 
     const formRegister = useForm({
@@ -49,6 +82,22 @@ export const Account = () => {
         }
     }
 
+    const onLogin = async () => {
+        if (formLogin.validate()) {
+            try {
+                await dispatch(loginAction(formLogin.values)).unwrap()
+                message.success('Login success')
+            } catch (err) {
+                handleError(err)
+            }
+        }
+    }
+
+    const _copyToClipboard = (ev) => {
+        copyToClipboard(ev.target.innerText)
+        message.info('Copy to clipboard')
+    }
+
     return (
         <section className="py-12">
             <div className="container">
@@ -60,12 +109,13 @@ export const Account = () => {
                                 {/* Heading */}
                                 <h6 className="mb-7">Returning Customer</h6>
                                 {/* Form */}
-                                <form>
+                                <div>
                                     <div className="row">
                                         <div className="col-12">
                                             {/* Email */}
                                             <Field
                                                 placeholder="Email Address *"
+                                                {...formLogin.register('username')}
                                             />
                                         </div>
                                         <div className="col-12">
@@ -73,13 +123,8 @@ export const Account = () => {
                                             <Field
                                                 placeholder="Password *"
                                                 type="password"
+                                                {...formLogin.register('password')}
                                             />
-                                            <div className="form-group">
-                                                <label className="sr-only" htmlFor="loginPassword">
-                                                    Password *
-                                                </label>
-                                                <input className="form-control form-control-sm" id="loginPassword" type="password" placeholder="Password *" required />
-                                            </div>
                                         </div>
                                         <div className="col-12 col-md">
                                             {/* Remember */}
@@ -101,12 +146,12 @@ export const Account = () => {
                                         </div>
                                         <div className="col-12">
                                             {/* Button */}
-                                            <a href="./account-personal-info.html" className="btn btn-sm btn-dark" type="submit">
+                                            <Button onClick={onLogin} loading={loginLoading}>
                                                 Sign In
-                                            </a>
+                                            </Button>
                                         </div>
                                         <div className="col-12">
-                                            <p className="font-size-sm text-muted mt-5 mb-2 font-light">Tài khoản demo: <b className="text-black">demo@spacedev.com / Spacedev@123</b></p>
+                                            <p className="font-size-sm text-muted mt-5 mb-2 font-light">Tài khoản demo: <b className="text-black"><span className="cursor-pointer underline" onClick={_copyToClipboard}>demo@spacedev.com</span> / <span className="cursor-pointer underline" onClick={_copyToClipboard}>Spacedev@123</span></b></p>
                                             <p className="font-size-sm text-muted mt-5 mb-2 font-light text-justify">
                                                 Chúng tôi cung cấp cho bạn tài khoản demo vì mục đích học tập, để đảm bảo những người khác có thể sử dụng chung tài khoản chúng tôi sẽ
                                                 hạn chế rất nhiều quyền trên tài khoản này ví dụ:  <br />
@@ -116,7 +161,7 @@ export const Account = () => {
                                             </p>
                                         </div>
                                     </div>
-                                </form>
+                                </div>
                             </div>
                         </div>
                     </div>

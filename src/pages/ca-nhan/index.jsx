@@ -1,6 +1,10 @@
+import { logoutAction } from '@/stories/auth'
 import React from 'react'
+import { useDispatch } from 'react-redux'
 
 export const Profile = () => {
+    const dispatch = useDispatch()
+
     return (
         <section className="pt-7 pb-12">
             <div className="container">
@@ -20,7 +24,10 @@ export const Profile = () => {
                                 <a className="list-group-item list-group-item-action dropright-toggle active" href="account-wishlist.html">Sản phẩm yêu thích</a>
                                 <a className="list-group-item list-group-item-action dropright-toggle " href="account-address.html">Sổ địa chỉ</a>
                                 <a className="list-group-item list-group-item-action dropright-toggle " href="account-payment.html">Sổ thanh toán</a>
-                                <a className="list-group-item list-group-item-action dropright-toggle" href="#!">Đăng xuất</a>
+                                <a onClick={ev => {
+                                    ev.preventDefault()
+                                    dispatch(logoutAction())
+                                }} className="list-group-item list-group-item-action dropright-toggle" href="#!">Đăng xuất</a>
                             </div>
                         </nav>
                     </div>
