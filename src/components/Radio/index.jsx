@@ -1,3 +1,4 @@
+import { cn } from "@/utils"
 import { createContext, useContext, useState } from "react"
 
 const Context = createContext({})
@@ -11,6 +12,15 @@ export const Radio = ({ children, ...props }) => {
                 {children}
             </label>
         </div>
+    )
+}
+
+Radio.Toggle = ({ children, ...props }) => {
+    const { value, onChange } = useContext(Context)
+    return (
+        <label className={cn("btn btn-sm btn-outline-border", { active: props.value == value })} onClick={() => onChange(props.value)}>
+            <input type="radio" name="gender" checked={props.value == value} /> {children}
+        </label>
     )
 }
 

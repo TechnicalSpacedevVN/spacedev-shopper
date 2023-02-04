@@ -6,11 +6,17 @@ import { useQuery } from '@/hooks/useQuery'
 import { userService } from '@/services/user'
 import { logoutAction, setUserAction } from '@/stories/auth'
 import { confirm, handleError, minMax, regexp, required, validate } from '@/utils'
-import { message } from 'antd'
-import React from 'react'
+import { DatePicker, message } from 'antd'
+import React, { useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import _ from 'lodash'
 import { object } from '@/utils/object'
+import { avatarDefault } from '@/config/assets'
+import { fileService } from '@/services/file'
+import { UploadFile } from '@/components/UploadFile'
+import dayjs from 'dayjs'
+import { Radio } from '@/components/Radio'
+
 
 const rules = {
     name: [required()],
@@ -43,6 +49,7 @@ const rules = {
 }
 
 export const Profile = () => {
+    const fileRef = useRef()
     const dispatch = useDispatch()
     const { user } = useAuth()
     const userForm = useForm(rules, { initialValue: user })
@@ -59,19 +66,34 @@ export const Profile = () => {
 
     const onSubmit = async () => {
 
-        const checkOldData = object.isEqual(user, userForm.values, 'name', 'phone')
+        const checkOldData = object.isEqual(user, userForm.values, 'name', 'phone', 'birthday', 'gender')
+        let avatar
+        if (fileRef.current) {
+            const res = await fileService.uploadFile(fileRef.current)
 
-        if (!userForm.values.newPassword && checkOldData) {
+            if (res.link) {
+                avatar = res.link
+            }
+        }
+
+
+
+        if (!avatar && !userForm.values.newPassword && checkOldData) {
             message.warning('Vui lòng nhập thông tin để thay đổi')
             return
         }
 
 
+
         if (userForm.validate()) {
-            if (!checkOldData) {
-                updateProfileService(userForm.values)
+            if (avatar || !checkOldData) {
+                updateProfileService({
+                    ...userForm.values,
+                    avatar
+                })
                     .then(res => {
                         dispatch(setUserAction(res.data))
+                        fileRef.current = null
                         message.success('Cập nhật thông tin tài khoản thành công')
                     }).catch(handleError)
             }
@@ -96,6 +118,8 @@ export const Profile = () => {
         }
 
     }
+
+
 
     return (
         <section className="pt-7 pb-12">
@@ -125,17 +149,21 @@ export const Profile = () => {
                     </div>
                     <div className="col-12 col-md-9 col-lg-8 offset-lg-1">
                         {/* Form */}
-                        <form>
+                        <div>
                             <div className="row">
                                 <div className="col-12">
-                                    <div className="profile-avatar">
-                                        <div className="wrap">
-                                            <img src="./img/avt.png" />
-                                            <i className="icon">
-                                                <img src="./img/icons/icon-camera.svg" />
-                                            </i>
-                                        </div>
-                                    </div>
+                                    <UploadFile onChange={(file) => fileRef.current = file}>
+                                        {(previewSrc, trigger) => (
+                                            <div className="profile-avatar" >
+                                                <div className="wrap" onClick={trigger}>
+                                                    <img src={previewSrc || user.avatar || avatarDefault} />
+                                                    <i className="icon">
+                                                        <img src="./img/icons/icon-camera.svg" />
+                                                    </i>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </UploadFile>
                                 </div>
                                 <div className="col-12">
                                     {/* Email */}
@@ -191,31 +219,32 @@ export const Profile = () => {
                                     />
                                 </div>
                                 <div className="col-12 col-lg-6">
-                                    <div className="form-group">
-                                        <label>Date of Birth</label>
-                                        <input className="form-control form-control-sm" type="date" placeholder="dd/mm/yyyy" required />
-                                    </div>
+                                    <Field
+                                        label="Date of Birth"
+                                        {...userForm.register('birthday')}
+                                        renderField={(props) => <DatePicker format="DD/MM/YYYY" value={props.value ? dayjs(props.value) : undefined} onChange={(ev, date) => props?.onChange?.(date)} className="form-control form-control-sm" />}
+                                    />
+
                                 </div>
                                 <div className="col-12 col-lg-6">
                                     {/* Gender */}
-                                    <div className="form-group mb-8">
-                                        <label>Gender</label>
-                                        <div className="btn-group-toggle" data-toggle="buttons">
-                                            <label className="btn btn-sm btn-outline-border active">
-                                                <input type="radio" name="gender" defaultChecked /> Male
-                                            </label>
-                                            <label className="btn btn-sm btn-outline-border">
-                                                <input type="radio" name="gender" /> Female
-                                            </label>
-                                        </div>
-                                    </div>
+                                    <Field
+                                        label="Gender"
+                                        {...userForm.register('gender')}
+                                        renderField={props => <div className="btn-group-toggle">
+                                            <Radio.Group defaultValue={props.value} onChange={value => props?.onChange?.(value)}>
+                                                <Radio.Toggle value="male">Male</Radio.Toggle>
+                                                <Radio.Toggle value="female">Female</Radio.Toggle>
+                                            </Radio.Group>
+                                        </div>}
+                                    />
                                 </div>
                                 <div className="col-12">
                                     {/* Button */}
                                     <Button onClick={onSubmit} loading={loading}>Save Changes</Button>
                                 </div>
                             </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
