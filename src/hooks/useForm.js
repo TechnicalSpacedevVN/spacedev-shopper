@@ -1,4 +1,4 @@
-import { useCallback } from "react"
+import { useCallback, useEffect } from "react"
 import { useState } from "react"
 import { validate } from "../utils/validate"
 
@@ -10,6 +10,10 @@ import { validate } from "../utils/validate"
 export const useForm = (rules, { initialValue = {}, dependencies = {} } = {}) => {
     const [values, setValues] = useState(initialValue)
     const [errors, setError] = useState({})
+
+    useEffect(() => {
+        setValues(initialValue)
+    }, [JSON.stringify(initialValue)])
 
 
     const register = (name) => {
@@ -55,6 +59,7 @@ export const useForm = (rules, { initialValue = {}, dependencies = {} } = {}) =>
 
     return {
         values,
+        setValues,
         errors,
         register,
         validate: _validate,

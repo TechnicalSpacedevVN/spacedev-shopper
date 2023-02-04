@@ -6,5 +6,11 @@ export const userService = {
     },
     getUser() {
         return http.get(`${USER_API}`)
+    },
+    updateProfile(data) {
+        return http.patch(`${USER_API}`, data)
+    },
+    changePassword(data) {
+        return http.post(`${USER_API}/change-password`, data)
     }
 }
