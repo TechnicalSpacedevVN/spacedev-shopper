@@ -1,4 +1,6 @@
 import { localStorageCache, sessionStorageCache } from "@/utils/cache"
+import { delay } from "@/utils/delay"
+import { CanceledError } from "axios"
 import { useRef } from "react"
 import { useMemo } from "react"
 import { useEffect, useState } from "react"
@@ -20,6 +22,7 @@ export const useQuery = ({
     enabled = true,
     cacheTime,
     keepPrevousData = false,
+    limitDuration,
     storeDriver = 'localStorage'
 } = {}) => {
 
@@ -67,7 +70,7 @@ export const useQuery = ({
 
             // Kiểm tra cache xem có dữ liệu hay không
             return cache.get(queryKey)
-           
+
         }
 
     }
@@ -90,24 +93,44 @@ export const useQuery = ({
     const fetchData = async () => {
         controllerRef.current.abort()
         controllerRef.current = new AbortController()
+        const startTime = Date.now()
 
+        let res
+        let error
         try {
             setLoading(true)
             setStatus('pending')
 
-            let res = getCacheDataOrPrivousData()
+            res = getCacheDataOrPrivousData()
 
             if (!res) {
                 res = queryFn({ signal: controllerRef.current.signal })
-                if(cacheName) {
+                if (cacheName) {
                     _asyncFunction[cacheName] = res
                 }
             }
 
-            if(res instanceof Promise) {
+            if (res instanceof Promise) {
                 res = await res
             }
 
+
+
+        } catch (err) {
+            console.log(err)
+            error = err
+        }
+
+        const endTime = Date.now()
+
+        if (limitDuration) {
+            let timeout = endTime - startTime
+            if (timeout < limitDuration) {
+                await delay(limitDuration - timeout)
+            }
+        }
+
+        if (res) {
             setStatus('success')
             setData(res)
 
@@ -115,17 +138,21 @@ export const useQuery = ({
 
             refetchRef.current = false
             setLoading(false)
-        } catch (err) {
-            console.log(err)
-            if (err instanceof CanceledError) {
-
-            } else {
-                setError(err)
-                setStatus('error')
-                setLoading(false)
-            }
-
+            return res
         }
+
+
+
+        if (error instanceof CanceledError) {
+
+        } else {
+            setError(err)
+            setStatus('error')
+            setLoading(false)
+            throw err
+        }
+
+
 
     }
     return {
