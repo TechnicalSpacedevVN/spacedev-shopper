@@ -1,12 +1,64 @@
-import { currency } from "@/utils"
+import { currency, handleError } from "@/utils"
 import { Skeleton } from "../Skeleton"
 import { useCategory } from "@/hooks/useCategories"
+import { productService } from "@/services/product"
+import { message } from "antd"
+import { delay } from "@/utils/delay"
+import { useNavigate } from "react-router-dom"
+import { PATH } from "@/config"
+import { useAuth } from "@/hooks/useAuth"
+import { Popconfirm } from "../Popconfirm"
 
-export const ProductCard = ({ images, categories, rating_average, review_count, name, price, real_price, slug, discount_rate }) => {
-
+export const ProductCard = ({onRemoveWishlistSuccess, showRemove, showWishlist, id, images, categories, rating_average, review_count, name, price, real_price, slug, discount_rate }) => {
     const img1 = images?.[0]?.thumbnail_url
     const img2 = images?.[1] ? images?.[1]?.thumbnail_url : img1
     const category = useCategory(categories)
+    const navigate = useNavigate()
+    const { user } = useAuth()
+
+    const onAddWishlist = async () => {
+
+        const key = `add-wishlist-${id}`
+
+        try {
+
+            message.loading({
+                key,
+                content: `Đang thêm sản phẩm "${name}" vào yêu thích`,
+                duration: 0
+            })
+            await productService.addWishlist(id)
+            message.success({
+                key,
+                content: `Thêm sản phẩm "${name}" vào yêu thích thành công`
+            })
+        } catch (err) {
+            handleError(err, key)
+        }
+    }
+
+    const onRemoveWishlist = async () => {
+
+        const key = `remove-wishlist-${id}`
+
+        try {
+
+            message.loading({
+                key,
+                content: `Đang xóa sản phẩm "${name}" khỏi yêu thích`,
+                duration: 0
+            })
+            await productService.removeWishlist(id)
+            message.success({
+                key,
+                content: `Xóa sản phẩm "${name}" khỏi yêu thích thành công`
+            })
+            onRemoveWishlistSuccess?.(id)
+        } catch (err) {
+            handleError(err, key)
+        }
+    }
+
 
     return (
         <div className="col-6 col-md-4">
@@ -36,11 +88,33 @@ export const ProductCard = ({ images, categories, rating_average, review_count, 
                                 <i className="fe fe-shopping-cart" />
                             </button>
                         </span>
-                        <span className="card-action">
-                            <button className="btn btn-xs btn-circle btn-white-primary" data-toggle="button">
-                                <i className="fe fe-heart" />
-                            </button>
-                        </span>
+                        {
+                            showWishlist && <Popconfirm
+                                disabled={!!user}
+                                title="Thông báo"
+                                description="Vui lòng đăng nhập trước khi đưa sản phẩm vào yêu thích"
+                                onConfirm={() => navigate(PATH.Account)}
+                                okText="Đăng nhập"
+                                showCancel={false}
+                            >
+                                <span className="card-action">
+                                    <button onClick={user ? onAddWishlist : undefined} className="btn btn-xs btn-circle btn-white-primary" data-toggle="button">
+                                        <i className="fe fe-heart" />
+                                    </button>
+                                </span>
+                            </Popconfirm>
+                        }
+
+                        {
+                            showRemove && (
+                                <span className="card-action">
+                                    <button onClick={onRemoveWishlist} className="btn btn-xs btn-circle btn-white-primary" data-toggle="button">
+                                        <i className="fe fe-x" />
+                                    </button>
+                                </span>
+                            )
+                        }
+
                     </div>
                 </div>
                 {/* Body */}
@@ -50,7 +124,7 @@ export const ProductCard = ({ images, categories, rating_average, review_count, 
                         {
                             category && <a className="text-muted" href="shop.html">{category.title}</a>
                         }
-                        
+
                     </div>
                     {/* Title */}
                     <div className="card-product-title font-weight-bold">
@@ -104,21 +178,6 @@ export const ProductCardLoading = () => {
                     <a className="card-img-hover" href="product.html">
                         <Skeleton height={300} />
                     </a>
-                    {/* Actions */}
-                    <div className="card-actions">
-                        <span className="card-action">
-                        </span>
-                        <span className="card-action">
-                            <button className="btn btn-xs btn-circle btn-white-primary" data-toggle="button">
-                                <i className="fe fe-shopping-cart" />
-                            </button>
-                        </span>
-                        <span className="card-action">
-                            <button className="btn btn-xs btn-circle btn-white-primary" data-toggle="button">
-                                <i className="fe fe-heart" />
-                            </button>
-                        </span>
-                    </div>
                 </div>
                 {/* Body */}
                 <div className="card-body px-0">
@@ -130,7 +189,7 @@ export const ProductCardLoading = () => {
                     </div>
                     {/* Title */}
                     <div className="card-product-title font-weight-bold">
-                        <a className="text-body card-product-name" href="product.html"><Skeleton height="100%"/></a>
+                        <a className="text-body card-product-name" href="product.html"><Skeleton height="100%" /></a>
                     </div>
 
                     <div className="card-product-rating">

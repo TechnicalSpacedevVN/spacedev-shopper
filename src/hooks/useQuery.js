@@ -60,14 +60,12 @@ export const useQuery = ({
     const getCacheDataOrPrivousData = () => {
 
         if (cacheName) {
-            if (keepPrevousData && dataRef[cacheName]) {
-                return dataRef[cacheName]
+            if (keepPrevousData && dataRef.current[cacheName]) {
+                return  dataRef.current[cacheName]
             }
-
             if (_asyncFunction[cacheName]) {
                 return _asyncFunction[cacheName]
             }
-
             // Kiểm tra cache xem có dữ liệu hay không
             return cache.get(queryKey)
 
@@ -77,7 +75,7 @@ export const useQuery = ({
 
     const setCacheDataOrPrivousData = (data) => {
         if (keepPrevousData) {
-            dataRef[cacheName] = data
+            dataRef.current[cacheName] = data
         }
 
         if (cacheName && cacheTime) {
@@ -130,6 +128,9 @@ export const useQuery = ({
             }
         }
 
+
+        if (cacheName) delete _asyncFunction[cacheName]
+
         if (res) {
             setStatus('success')
             setData(res)
@@ -141,25 +142,26 @@ export const useQuery = ({
             return res
         }
 
-
-
         if (error instanceof CanceledError) {
-
+            
         } else {
             setError(err)
             setStatus('error')
             setLoading(false)
             throw err
         }
+    }
 
 
-
+    const clearPreviousData = () => {
+        dataRef.current = {}
     }
     return {
         loading,
         error,
         data,
         status,
-        refetch: fetchData
+        refetch: fetchData,
+        clearPreviousData
     }
 }

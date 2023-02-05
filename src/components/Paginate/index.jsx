@@ -42,6 +42,7 @@ export const Paginate = ({ totalPage, name = 'page' }) => {
     _search.set(name, currentPage + 1)
     const nextLink = `${pathname}?${_search.toString()}`
 
+    if(totalPage <= 1) return null
 
     return (
         <nav className="d-flex justify-content-center justify-content-md-end">
