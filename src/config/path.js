@@ -12,7 +12,9 @@ export const PATH = {
         Address: PROFILE + '/so-dia-chi',
         NewAddress: PROFILE + '/so-dia-chi/new',
         EditAddress: PROFILE + '/so-dia-chi/edit/:id',
-        Payment: PROFILE + '/so-thanh-toan'
+        Payment: PROFILE + '/so-thanh-toan',
+        NewPayment: PROFILE + '/so-thanh-toan/new',
+        EditPayment: PROFILE + '/so-thanh-toan/edit/:id',
     },
     Account: '/tai-khoan'
 }

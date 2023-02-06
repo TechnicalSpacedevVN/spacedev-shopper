@@ -5,6 +5,8 @@ import { Order } from "@/pages/ca-nhan/don-hang";
 import { WishlistPage } from "@/pages/ca-nhan/san-pham-yeu-thich";
 import { AddressPage } from "@/pages/ca-nhan/so-dia-chi";
 import { ActionAddressPage } from "@/pages/ca-nhan/so-dia-chi/action";
+import { PaymentPage } from "@/pages/ca-nhan/so-thanh-toan";
+import { ActionPaymentPage } from "@/pages/ca-nhan/so-thanh-toan/action";
 
 export const profile = [
     {
@@ -30,6 +32,21 @@ export const profile = [
                 element: <ActionAddressPage />,
                 path: PATH.Profile.EditAddress
             },
+
+            {
+                element: <PaymentPage />,
+                path: PATH.Profile.Payment
+            },
+            {
+                element: <ActionPaymentPage />,
+                path: PATH.Profile.NewPayment
+            },
+            {
+                element: <ActionPaymentPage />,
+                path: PATH.Profile.EditPayment
+            },
+
+
             {
                 element: <Order />,
                 path: PATH.Profile.Order
