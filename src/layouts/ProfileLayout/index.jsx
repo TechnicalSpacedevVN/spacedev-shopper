@@ -22,7 +22,7 @@ export const ProfileLayout = () => {
                                 <NavLink className="list-group-item list-group-item-action dropright-toggle " to="account-orders.html">Theo dõi đơn hàng</NavLink>
                                 <NavLink className="list-group-item list-group-item-action dropright-toggle " end to={PATH.Profile.index}>Thông tin cá nhân</NavLink>
                                 <NavLink className="list-group-item list-group-item-action dropright-toggle " to={PATH.Profile.Wishlist}>Sản phẩm yêu thích</NavLink>
-                                <NavLink className="list-group-item list-group-item-action dropright-toggle " to="account-address.html">Sổ địa chỉ</NavLink>
+                                <NavLink className="list-group-item list-group-item-action dropright-toggle " to={PATH.Profile.Address}>Sổ địa chỉ</NavLink>
                                 <NavLink className="list-group-item list-group-item-action dropright-toggle " to="account-payment.html">Sổ thanh toán</NavLink>
                                 <a onClick={ev => {
                                     ev.preventDefault()

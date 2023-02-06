@@ -21,6 +21,8 @@ export const useQuery = ({
     dependencyList = [],
     enabled = true,
     cacheTime,
+    onSuccess,
+    onError,
     keepPrevousData = false,
     limitDuration,
     storeDriver = 'localStorage'
@@ -131,8 +133,9 @@ export const useQuery = ({
 
         if (cacheName) delete _asyncFunction[cacheName]
 
-        if (res) {
+        if (res && !(res instanceof Promise)) {
             setStatus('success')
+            onSuccess?.(res)
             setData(res)
 
             setCacheDataOrPrivousData(res)
@@ -145,10 +148,11 @@ export const useQuery = ({
         if (error instanceof CanceledError) {
             
         } else {
-            setError(err)
+            onError?.(error)
+            setError(error)
             setStatus('error')
             setLoading(false)
-            throw err
+            throw error
         }
     }
 
