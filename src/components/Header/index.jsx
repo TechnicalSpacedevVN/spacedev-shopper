@@ -2,10 +2,16 @@ import { PATH } from '@/config'
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { SearchDrawer } from '../SearchDrawer'
+import { useAuth } from '@/hooks/useAuth'
+import { avatarDefault } from '@/config/assets'
+import { Dropdown } from 'antd'
+import { useDispatch } from 'react-redux'
+import { logoutAction } from '@/stories/auth'
 
 export const Header = () => {
+    const { user } = useAuth()
     const [openSearchDrawer, setOpenSerachDrawer] = useState(false)
-
+    const dispatch = useDispatch()
     return (
         <>
             <SearchDrawer open={openSearchDrawer} onClose={() => setOpenSerachDrawer(false)} />
@@ -155,11 +161,43 @@ export const Header = () => {
                                         </span>
                                     </a>
                                 </li>
-                                <li className="nav-item ml-lg-n4">
-                                    <Link className="nav-link" to={PATH.Account}>
-                                        <i className="fe fe-user" />
-                                    </Link>
-                                </li>
+                                {
+                                    user ? (
+                                        <Dropdown arrow placement="bottomRight" menu={{ items: [
+                                            {
+                                                key: 1,
+                                                label: <Link to={PATH.Profile.Order}>Đơn hàng của tôi</Link>
+                                            },
+                                            {
+                                                key: 2,
+                                                label: <Link to={PATH.Profile.index}>Thông tin tài khoản</Link>
+                                            },
+                                            {
+                                                key: 3,
+                                                label: 'Đăng xuất',
+                                                onClick: () => {
+                                                    dispatch(logoutAction())
+                                                }
+                                            },
+                                            
+                                        ] }}>
+                                            <li class="nav-item ml-lg-n4">
+                                                <Link class="header-avatar nav-link" to={PATH.Profile.index}>
+                                                    <img src={user?.avatar || avatarDefault} />
+                                                </Link>
+                                            </li>
+                                        </Dropdown>
+                                    ) : (
+                                        <li className="nav-item ml-lg-n4">
+                                            <Link className="nav-link" to={PATH.Account}>
+                                                <i className="fe fe-user" />
+                                            </Link>
+                                        </li>
+
+                                    )
+                                }
+
+
                             </ul>
                         </div>
                     </div>

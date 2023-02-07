@@ -1,5 +1,5 @@
 import { Paginate } from '@/components/Paginate'
-import { ProductCard, ProductCardLoading } from '@/components/ProductCard'
+import { ListProductCard, ProductCard, ProductCardLoading } from '@/components/ProductCard'
 import { Skeleton } from '@/components/Skeleton'
 import { PATH } from '@/config'
 import { useQuery } from '@/hooks/useQuery'
@@ -8,14 +8,16 @@ import { cn, slugify } from '@/utils'
 import React, { useEffect, useRef, useState } from 'react'
 import { Link, generatePath, useParams, useSearchParams } from 'react-router-dom'
 import queryString from 'query-string'
-import { useCategories } from '@/hooks/useCategories'
+import { useCategories, useCategory } from '@/hooks/useCategories'
 import { useSearch } from '@/hooks/useSearch'
 import { useDidUpdateEffect } from '@/hooks/useDidUpdateEffect'
 import { Radio } from '@/components/Radio'
+import { Breadcrumb } from '@/components/Breadcrumb'
 
 export const ProductPage = () => {
 
     const { id } = useParams()
+
 
     const [search, setSearch] = useSearch({
         page: 1,
@@ -51,7 +53,7 @@ export const ProductPage = () => {
     })
 
     const { data: categories, loading: categoryLoading } = useCategories()
-
+    const category = useCategory(parseInt(id))
     return (
         <section className="py-11">
             <div className="container">
@@ -108,7 +110,7 @@ export const ProductPage = () => {
                                     </a>
                                     {/* Collapse */}
                                     <Radio.Group
-                                        defaultValue={search.filterRating}
+                                        value={search.filterRating}
                                         toggle
                                         onChange={(value) => {
                                             setSearch({
@@ -228,16 +230,24 @@ export const ProductPage = () => {
                         <div className="row align-items-center mb-7">
                             <div className="col-12 col-md">
                                 {/* Heading */}
-                                <h3 className="mb-1">Womens' Clothing</h3>
+                                <h3 className="mb-1">{
+                                    category ? category.title : 'Tất cả sản phẩm'
+                                }</h3>
                                 {/* Breadcrumb */}
-                                <ol className="breadcrumb mb-md-0 font-size-xs text-gray-400">
+                                {/* <ol className="breadcrumb mb-md-0 font-size-xs text-gray-400">
                                     <li className="breadcrumb-item">
                                         <a className="text-gray-400" href="index.html">Home</a>
                                     </li>
                                     <li className="breadcrumb-item active">
                                         Women's Clothing
                                     </li>
-                                </ol>
+                                </ol> */}
+                                <Breadcrumb>
+                                    <Breadcrumb.Item to={PATH.Home}>Home</Breadcrumb.Item>
+                                    <Breadcrumb.Item>
+                                        {category ? category.title : 'Tất cả sản phẩm'}
+                                    </Breadcrumb.Item>
+                                </Breadcrumb>
                             </div>
                             <div className="col-12 col-md-auto flex gap-1 items-center whitespace-nowrap">
                                 {/* Select */}
@@ -263,12 +273,13 @@ export const ProductPage = () => {
 
                         {/* Products */}
                         <div className="row">
+                            <ListProductCard
+                                loadingCount={15}
+                                loading={loading}
+                                data={data?.data}
+                                showWishlist
 
-
-                            {
-                                loading ? Array.from(Array(15)).map((_, i) => <ProductCardLoading key={i} />) :
-                                    data.data.map(e => <ProductCard showWishlist key={e.id} {...e} />)
-                            }
+                            />
                         </div>
                         {/* Pagination */}
                         <Paginate totalPage={data?.paginate?.totalPage} />

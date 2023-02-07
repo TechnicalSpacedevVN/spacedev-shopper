@@ -8,6 +8,10 @@ import { useNavigate } from "react-router-dom"
 import { PATH } from "@/config"
 import { useAuth } from "@/hooks/useAuth"
 import { Popconfirm } from "../Popconfirm"
+import { withListLoading } from "@/utils/withListLoading"
+import { useRef } from "react"
+import { useAction } from "@/hooks/useAction"
+import { Rating } from "../Rating"
 
 export const ProductCard = ({onRemoveWishlistSuccess, showRemove, showWishlist, id, images, categories, rating_average, review_count, name, price, real_price, slug, discount_rate }) => {
     const img1 = images?.[0]?.thumbnail_url
@@ -16,48 +20,68 @@ export const ProductCard = ({onRemoveWishlistSuccess, showRemove, showWishlist, 
     const navigate = useNavigate()
     const { user } = useAuth()
 
-    const onAddWishlist = async () => {
+    const onAddWishlist = useAction({
+        service: () => productService.addWishlist(id),
+        loadingMessage: `Đang thêm sản phẩm "${name}" vào yêu thích`,
+        successMessage: `Thêm sản phẩm "${name}" vào yêu thích thành công`
+    })
 
-        const key = `add-wishlist-${id}`
+    // const flagWishlistRef = useRef(false)
 
-        try {
 
-            message.loading({
-                key,
-                content: `Đang thêm sản phẩm "${name}" vào yêu thích`,
-                duration: 0
-            })
-            await productService.addWishlist(id)
-            message.success({
-                key,
-                content: `Thêm sản phẩm "${name}" vào yêu thích thành công`
-            })
-        } catch (err) {
-            handleError(err, key)
-        }
-    }
+    // const onAddWishlist = async () => {
+    //     if(flagWishlistRef.current) return
 
-    const onRemoveWishlist = async () => {
+    //     flagWishlistRef.current = true
+    //     const key = `add-wishlist-${id}`
 
-        const key = `remove-wishlist-${id}`
+    //     try {
 
-        try {
+    //         message.loading({
+    //             key,
+    //             content: `Đang thêm sản phẩm "${name}" vào yêu thích`,
+    //             duration: 0
+    //         })
+    //         await productService.addWishlist(id)
+    //         message.success({
+    //             key,
+    //             content: `Thêm sản phẩm "${name}" vào yêu thích thành công`
+    //         })
+    //     } catch (err) {
+    //         handleError(err, key)
+    //     }
 
-            message.loading({
-                key,
-                content: `Đang xóa sản phẩm "${name}" khỏi yêu thích`,
-                duration: 0
-            })
-            await productService.removeWishlist(id)
-            message.success({
-                key,
-                content: `Xóa sản phẩm "${name}" khỏi yêu thích thành công`
-            })
-            onRemoveWishlistSuccess?.(id)
-        } catch (err) {
-            handleError(err, key)
-        }
-    }
+    //     flagWishlistRef.current = false
+    // }
+
+    const onRemoveWishlist = useAction({
+        service: () => productService.removeWishlist(id),
+        loadingMessage: `Đang xóa sản phẩm "${name}" khỏi yêu thích`,
+        successMessage: `Xóa sản phẩm "${name}" khỏi yêu thích thành công`,
+        onSuccess: onRemoveWishlistSuccess
+    })
+
+    // const onRemoveWishlist = async () => {
+
+    //     const key = `remove-wishlist-${id}`
+
+    //     try {
+
+    //         message.loading({
+    //             key,
+    //             content: `Đang xóa sản phẩm "${name}" khỏi yêu thích`,
+    //             duration: 0
+    //         })
+    //         await productService.removeWishlist(id)
+    //         message.success({
+    //             key,
+    //             content: `Xóa sản phẩm "${name}" khỏi yêu thích thành công`
+    //         })
+    //         onRemoveWishlistSuccess?.(id)
+    //     } catch (err) {
+    //         handleError(err, key)
+    //     }
+    // }
 
 
     return (
@@ -135,11 +159,7 @@ export const ProductCard = ({onRemoveWishlistSuccess, showRemove, showWishlist, 
                         {
                             review_count > 0 && <>
                                 {rating_average}
-                                <svg svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 24 24" size={14} color="#fdd836" height={14} width={14} xmlns="http://www.w3.org/2000/svg" style={{ color: 'rgb(253, 216, 54)' }}><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
-                                <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 24 24" size={14} color="#fdd836" height={14} width={14} xmlns="http://www.w3.org/2000/svg" style={{ color: 'rgb(253, 216, 54)' }}><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
-                                <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 24 24" size={14} color="#fdd836" height={14} width={14} xmlns="http://www.w3.org/2000/svg" style={{ color: 'rgb(253, 216, 54)' }}><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
-                                <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 24 24" size={14} color="#fdd836" height={14} width={14} xmlns="http://www.w3.org/2000/svg" style={{ color: 'rgb(253, 216, 54)' }}><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
-                                <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 24 24" size={14} color="#fdd836" height={14} width={14} xmlns="http://www.w3.org/2000/svg" style={{ color: 'rgb(253, 216, 54)' }}><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
+                                <Rating value={rating_average} />
                                 ({review_count} review)
                             </>
                         }
@@ -205,3 +225,6 @@ export const ProductCardLoading = () => {
         </div >
     )
 }
+
+
+export const ListProductCard = withListLoading(ProductCard, ProductCardLoading, <div className="col-12"><p className="text-xl border p-5 text-center w-full mb-5">Không tìm thấy sản phẩm nào 😞</p></div>)

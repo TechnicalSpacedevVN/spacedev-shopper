@@ -14,6 +14,7 @@ import { userService } from '@/services/user'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery } from '@/hooks/useQuery'
 import { Spin, message } from 'antd'
+import { object } from '@/utils/object'
 
 const rules = {
     cardName: [required()],
@@ -62,6 +63,9 @@ export const ActionPaymentPage = () => {
     const onSubmit = async () => {
         try {
             if (form.validate()) {
+                if (id && object.isEqual(form.values, paymentDetail.data)) {
+                    return message.warning('Vui lòng thay đổi dữ liệu trước khi bấm cập nhật')
+                }
                 await actionService({
                     ...form.values,
                     type: typeRef.current,

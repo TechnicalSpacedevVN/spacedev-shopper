@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { Skeleton } from '../Skeleton'
 import { withLoading } from '@/utils/withLoading'
 import { withListLoading } from '@/utils/withListLoading'
@@ -9,6 +9,7 @@ import { userService } from '@/services/user'
 import { message } from 'antd'
 import { Link, generatePath } from 'react-router-dom'
 import { PATH } from '@/config'
+import { useAction } from '@/hooks/useAction'
 
 
 const AddressCardLoading = () => {
@@ -33,46 +34,64 @@ const AddressCardLoading = () => {
 }
 
 export const AddressCard = withLoading(({ onDeleteAddress, onChangeAddressDefault, _id, fullName, email, phone, province, district, address, default: addressDefault }) => {
-
+    // const flagRemoveAddressRef = useRef(false)
     
-    const _onDeleteAddress = async () => {
-        try {
-            const key = 'delete-address'
-            message.loading({
-                key,
-                content: 'Đang xóa địa chỉ'
-            })
-            await userService.removeAddress(_id)
-            onDeleteAddress?.()
+    const _onDeleteAddress = useAction({
+        service: () => userService.removeAddress(_id),
+        loadingMessage: 'Đang xóa địa chỉ',
+        successMessage: 'Xóa địa chỉ thành công',
+        onSuccess: onDeleteAddress,
+        retry: false
+    })
 
-            message.success({
-                key,
-                content: 'Xóa địa chỉ thành công'
-            })
-        } catch (err) {
-            handleError(err)
-        }
-    }
+    // const _onDeleteAddress = async () => {
+    //     if(flagRemoveAddressRef.current) return
+    //     flagRemoveAddressRef.current = true
+
+    //     try {
+    //         const key = 'delete-address'
+    //         message.loading({
+    //             key,
+    //             content: 'Đang xóa địa chỉ'
+    //         })
+    //         await userService.removeAddress(_id)
+    //         onDeleteAddress?.()
+
+    //         message.success({
+    //             key,
+    //             content: 'Xóa địa chỉ thành công'
+    //         })
+    //     } catch (err) {
+    //         handleError(err, key)
+    //     }
+    // }
 
 
-    const _onChangeAddressDefault = async () => {
-        try {
-            const key = 'change-address-default'
-            message.loading({
-                key,
-                content: 'Thao tác đang được thực hiện'
-            })
-            await userService.editAddress(_id, { default: true })
-            onChangeAddressDefault?.()
+    const _onChangeAddressDefault = useAction({
+        service: () => userService.editAddress(_id, { default: true }),
+        loadingMessage: 'Thao tác đang được thực hiện',
+        successMessage: 'Thay đổi địa chỉ mặc định thành công',
+        onSuccess: onChangeAddressDefault
+    })
 
-            message.success({
-                key,
-                content: 'Thay đổi địa chỉ mặc định thành công'
-            })
-        } catch (err) {
-            handleError(err)
-        }
-    }
+    // const _onChangeAddressDefault = async () => {
+    //     try {
+    //         const key = 'change-address-default'
+    //         message.loading({
+    //             key,
+    //             content: 'Thao tác đang được thực hiện'
+    //         })
+    //         await userService.editAddress(_id, { default: true })
+    //         onChangeAddressDefault?.()
+
+    //         message.success({
+    //             key,
+    //             content: 'Thay đổi địa chỉ mặc định thành công'
+    //         })
+    //     } catch (err) {
+    //         handleError(err)
+    //     }
+    // }
 
 
     return (
