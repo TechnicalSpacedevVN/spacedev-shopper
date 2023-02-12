@@ -1,11 +1,13 @@
 import { ENV } from '@/config'
 import { configureStore } from '@reduxjs/toolkit'
 import { authReducer, getUserAction } from './auth'
+import { cartReducer, getCartAction } from './cart'
 
 
 export const store = configureStore({
     reducer: {
-        auth: authReducer
+        auth: authReducer,
+        cart: cartReducer
     },
     devTools: ENV === 'development',
     // middleware: []
@@ -13,3 +15,4 @@ export const store = configureStore({
 
 
 store.dispatch(getUserAction())
+store.dispatch(getCartAction())

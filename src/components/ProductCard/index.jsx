@@ -12,13 +12,16 @@ import { withListLoading } from "@/utils/withListLoading"
 import { useRef } from "react"
 import { useAction } from "@/hooks/useAction"
 import { Rating } from "../Rating"
+import { useDispatch } from "react-redux"
+import { addCartItemAction } from "@/stories/cart"
 
-export const ProductCard = ({onRemoveWishlistSuccess, showRemove, showWishlist, id, images, categories, rating_average, review_count, name, price, real_price, slug, discount_rate }) => {
+export const ProductCard = ({ onRemoveWishlistSuccess, showRemove, showWishlist, id, images, categories, rating_average, review_count, name, price, real_price, slug, discount_rate }) => {
     const img1 = images?.[0]?.thumbnail_url
     const img2 = images?.[1] ? images?.[1]?.thumbnail_url : img1
     const category = useCategory(categories)
     const navigate = useNavigate()
     const { user } = useAuth()
+    const dispatch = useDispatch()
 
     const onAddWishlist = useAction({
         service: () => productService.addWishlist(id),
@@ -83,6 +86,17 @@ export const ProductCard = ({onRemoveWishlistSuccess, showRemove, showWishlist, 
     //     }
     // }
 
+    const onAddCartItem = () => {
+        if (user) {
+            dispatch(addCartItemAction({
+                productId: id,
+                quantity: 1
+            }))
+        }else {
+            navigate(PATH.Account)
+        }
+
+    }
 
     return (
         <div className="col-6 col-md-4">
@@ -108,7 +122,7 @@ export const ProductCard = ({onRemoveWishlistSuccess, showRemove, showWishlist, 
                         <span className="card-action">
                         </span>
                         <span className="card-action">
-                            <button className="btn btn-xs btn-circle btn-white-primary" data-toggle="button">
+                            <button onClick={onAddCartItem} className="btn btn-xs btn-circle btn-white-primary" data-toggle="button">
                                 <i className="fe fe-shopping-cart" />
                             </button>
                         </span>

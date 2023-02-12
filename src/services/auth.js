@@ -9,6 +9,6 @@ export const authService = {
         return http.post(`${AUTHEN_API}/login-by-code`, data)
     },
     login(data) {
-        return http.post(`${AUTHEN_API}/login`, data)
+        return http.post(`${AUTHEN_API}/login-test`, data)
     }
 }
