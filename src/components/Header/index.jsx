@@ -177,7 +177,7 @@ export const Header = () => {
                                             ev.preventDefault()
                                             setOpenCartDrawer(true)
                                         }} className="nav-link" href="#">
-                                            <span data-cart-items={cart?.totalQuantity}>
+                                            <span data-cart-items={cart?.totalQuantity || undefined}>
                                                 <i className="fe fe-shopping-cart" />
                                             </span>
                                         </a>

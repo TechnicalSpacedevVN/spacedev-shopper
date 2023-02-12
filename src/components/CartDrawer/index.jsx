@@ -1,6 +1,7 @@
 import { useCart } from "@/hooks/useCart"
 import { Drawer } from "antd"
 import { CartItem } from "../CartItem"
+import { currency } from "@/utils"
 
 export const CartDrawer = ({ open, onClose }) => {
     const { cart } = useCart()
@@ -27,7 +28,7 @@ export const CartDrawer = ({ open, onClose }) => {
                     </ul>
                     {/* Footer */}
                     <div className="modal-footer line-height-fixed font-size-sm bg-light mt-auto">
-                        <strong>Subtotal</strong> <strong className="ml-auto">$89.00</strong>
+                        <strong>Subtotal</strong> <strong className="ml-auto">{currency(cart?.subTotal)}</strong>
                     </div>
                     {/* Buttons */}
                     <div className="modal-body"><a className="btn btn-block btn-outline-dark" href="./shopping-cart.html">View Cart</a>

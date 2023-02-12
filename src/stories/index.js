@@ -3,7 +3,6 @@ import { configureStore } from '@reduxjs/toolkit'
 import { authReducer, getUserAction } from './auth'
 import { cartReducer, getCartAction } from './cart'
 
-
 export const store = configureStore({
     reducer: {
         auth: authReducer,

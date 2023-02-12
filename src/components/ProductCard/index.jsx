@@ -13,7 +13,8 @@ import { useRef } from "react"
 import { useAction } from "@/hooks/useAction"
 import { Rating } from "../Rating"
 import { useDispatch } from "react-redux"
-import { addCartItemAction } from "@/stories/cart"
+import { updateCartItemAction } from "@/stories/cart"
+import { useCart } from "@/hooks/useCart"
 
 export const ProductCard = ({ onRemoveWishlistSuccess, showRemove, showWishlist, id, images, categories, rating_average, review_count, name, price, real_price, slug, discount_rate }) => {
     const img1 = images?.[0]?.thumbnail_url
@@ -22,6 +23,7 @@ export const ProductCard = ({ onRemoveWishlistSuccess, showRemove, showWishlist,
     const navigate = useNavigate()
     const { user } = useAuth()
     const dispatch = useDispatch()
+    const { cart } = useCart()
 
     const onAddWishlist = useAction({
         service: () => productService.addWishlist(id),
@@ -88,11 +90,16 @@ export const ProductCard = ({ onRemoveWishlistSuccess, showRemove, showWishlist,
 
     const onAddCartItem = () => {
         if (user) {
-            dispatch(addCartItemAction({
+
+            const { listItems } = cart
+            const product = listItems.find(e => e.productId === id)
+
+            dispatch(updateCartItemAction({
                 productId: id,
-                quantity: 1
+                quantity: product ? product.quantity + 1 : 1,
+                showPopover: true
             }))
-        }else {
+        } else {
             navigate(PATH.Account)
         }
 
