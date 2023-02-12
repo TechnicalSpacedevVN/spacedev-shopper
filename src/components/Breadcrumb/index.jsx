@@ -12,11 +12,11 @@ export const Breadcrumb = ({children}) => {
 
 Breadcrumb.Item = ({to, children}) => {
 
-    const Component = to ? Link : React.Fragment
-
     return (
         <li className="breadcrumb-item">
-            <Component className="text-gray-400" to={to}>{children}</Component>
+            {
+                to ? <Link className="text-gray-400" to={to}>{children}</Link> : children
+            }
         </li>
     )
 }

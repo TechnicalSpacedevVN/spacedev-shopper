@@ -32,7 +32,6 @@ export const ProductPage = () => {
         setMinPrice('')
         setMaxPrice('')
     }, [id])
-    console.log(minPrice)
 
     const qs = queryString.stringify({
         page: search.page,

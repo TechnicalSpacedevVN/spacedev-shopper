@@ -205,8 +205,8 @@ export const Header = () => {
 
                                             ]
                                         }}>
-                                            <li class="nav-item ml-lg-n4">
-                                                <Link class="header-avatar nav-link" to={PATH.Profile.index}>
+                                            <li className="nav-item ml-lg-n4">
+                                                <Link className="header-avatar nav-link" to={PATH.Profile.index}>
                                                     <img src={user?.avatar || avatarDefault} />
                                                 </Link>
                                             </li>

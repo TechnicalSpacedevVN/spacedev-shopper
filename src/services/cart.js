@@ -7,5 +7,8 @@ export const cartService = {
     },
     getCart() {
         return http.get(`${CART_API}`)
+    },
+    removeItem(productId) {
+        return http.delete(`${CART_API}/${productId}`)
     }
 }

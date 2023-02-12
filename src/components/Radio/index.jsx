@@ -8,7 +8,7 @@ export const Radio = ({ children, ...props }) => {
     const { value, onChange } = useContext(Context)
     return (
         <div className="custom-control custom-radio mb-3" onClick={() => onChange(props.value)}>
-            <input checked={props.value == value} className="custom-control-input" type="radio" />
+            <input checked={props.value == value} readOnly className="custom-control-input" type="radio" />
             <label className="custom-control-label flex items-center" htmlFor="seasonOne">
                 {children}
             </label>
@@ -20,7 +20,7 @@ Radio.Toggle = ({ children, ...props }) => {
     const { value, onChange } = useContext(Context)
     return (
         <label className={cn("btn btn-sm btn-outline-border", { active: props.value == value })} onClick={() => onChange(props.value)}>
-            <input type="radio" name="gender" checked={props.value == value} /> {children}
+            <input type="radio" name="gender" readOnly checked={props.value == value} /> {children}
         </label>
     )
 }
