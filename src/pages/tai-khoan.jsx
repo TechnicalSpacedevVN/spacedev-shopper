@@ -7,7 +7,7 @@ import { useQuery } from '@/hooks/useQuery'
 import { useSearch } from '@/hooks/useSearch'
 import { authService } from '@/services/auth'
 import { userService } from '@/services/user'
-import { loginAction, loginByCodeAction } from '@/stories/auth'
+import { loginAction, loginByCodeAction } from '@/stores/auth'
 import { regexp, required, confirm, handleError, copyToClipboard } from '@/utils'
 import { message } from 'antd'
 import { useEffect } from 'react'
@@ -85,7 +85,7 @@ export const Account = () => {
     const onLogin = async () => {
         if (formLogin.validate()) {
             try {
-                await dispatch(loginAction(formLogin.values)).unwrap()
+                dispatch(loginAction(formLogin.values))
                 message.success('Login success')
             } catch (err) {
                 handleError(err)

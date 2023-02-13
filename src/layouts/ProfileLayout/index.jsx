@@ -1,5 +1,5 @@
 import { PATH } from "@/config"
-import { logoutAction } from "@/stories/auth"
+import { logoutAction } from "@/stores/auth"
 import { useDispatch } from "react-redux"
 import { Link, NavLink, Outlet } from "react-router-dom"
 

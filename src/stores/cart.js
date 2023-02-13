@@ -2,39 +2,11 @@ import { cartService } from "@/services/cart";
 import { getToken } from "@/utils";
 import { createAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { takeLatest, call, put, takeEvery, delay } from 'redux-saga/effects'
+import { loginSuccessAction, logoutAction } from "./auth";
 
 export const updateCartItemAction = createAction('cart/addCartItem')
 export const removeCartItemAction = createAction('cart/removeItem')
-// export const updateCartItemAction = createAsyncThunk('cart/addCartItem', async (data, thunkApi) => {
-//     try {
-//         await cartService.addItem(data.productId, data.quantity)
-//         thunkApi.dispatch(getCartAction())
-//         if (data.showPopover) {
-//             thunkApi.dispatch(cartActions.togglePopover(true))
-
-//             window.scroll({
-//                 top: 0,
-//                 behavior: 'smooth'
-//             })
-//         }
-
-//     } catch (err) {
-//         throw err.response.data
-//     }
-// })
-
-export const getCartAction = createAsyncThunk('cart/getCart', async (_, thunkApi) => {
-    try {
-        if (getToken()) {
-            const cart = await cartService.getCart()
-            thunkApi.dispatch(cartActions.setCart(cart.data))
-            return cart
-        }
-
-    } catch (err) {
-        console.error(err)
-    }
-})
+export const getCartAction = createAction('cart/getCart')
 
 
 export const { reducer: cartReducer, actions: cartActions } = createSlice({
@@ -99,11 +71,26 @@ function* fetchRemoveItem(action) {
     }
 }
 
+function* fetchCart() {
+    if (getToken()) {
+        const cart = yield call(cartService.getCart)
+        yield put(cartActions.setCart(cart.data))
+        // thunkApi.dispatch(cartActions.setCart(cart.data))
+        return cart
+    }
+}
+
+function* clearCart() {
+    yield put(cartActions.setCart(null))
+}
 
 
 
 export function* cartSaga() {
+    console.log('cartSaga')
     // yield takeLatest('cart/getCart/pending', getCart)
     yield takeLatest(updateCartItemAction, fetchCartItem)
     yield takeLatest(removeCartItemAction, fetchRemoveItem)
+    yield takeLatest([getCartAction, loginSuccessAction], fetchCart)
+    yield takeLatest(logoutAction, clearCart)
 }

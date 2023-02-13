@@ -13,7 +13,7 @@ import { useRef } from "react"
 import { useAction } from "@/hooks/useAction"
 import { Rating } from "../Rating"
 import { useDispatch } from "react-redux"
-import { updateCartItemAction } from "@/stories/cart"
+import { updateCartItemAction } from "@/stores/cart"
 import { useCart } from "@/hooks/useCart"
 
 export const ProductCard = ({ onRemoveWishlistSuccess, showRemove, showWishlist, id, images, categories, rating_average, review_count, name, price, real_price, slug, discount_rate }) => {

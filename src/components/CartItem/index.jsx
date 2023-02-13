@@ -1,4 +1,4 @@
-import { removeCartItemAction, updateCartItemAction } from "@/stories/cart"
+import { removeCartItemAction, updateCartItemAction } from "@/stores/cart"
 import { currency } from "@/utils"
 import { useEffect, useRef, useState } from "react"
 import { useDispatch } from "react-redux"
@@ -8,7 +8,7 @@ import { Spin } from "antd"
 
 export const CartItem = ({ productId, product, quantity }) => {
     const dispatch = useDispatch()
-    const inputRef = useRef()
+    // const inputRef = useRef()
     const [_quantity, setQuantity] = useState(quantity)
     const { loading } = useCart()
     const _loading = loading[productId] || false
@@ -17,27 +17,37 @@ export const CartItem = ({ productId, product, quantity }) => {
 
 
     useEffect(() => {
-        if (parseInt(inputRef.current.value) !== quantity) {
-            inputRef.current.value = quantity
+        if (_quantity !== quantity) {
+            setQuantity(quantity)
         }
     }, [quantity])
 
     const onDecrement = () => {
-        inputRef.current.value--
+        // inputRef.current.value--
+        setQuantity(_quantity - 1)
 
         dispatch(updateCartItemAction({
             productId,
-            quantity: inputRef.current.value,
+            quantity: _quantity - 1,
         }))
 
     }
 
     const onIncrement = () => {
-        inputRef.current.value++
+        // inputRef.current.value++
+        setQuantity(_quantity + 1)
+
 
         dispatch(updateCartItemAction({
             productId,
-            quantity: inputRef.current.value
+            quantity: _quantity + 1
+        }))
+    }
+
+    const onUpdateQuantity = (val) => {
+        dispatch(updateCartItemAction({
+            productId,
+            quantity: val
         }))
     }
 
@@ -45,7 +55,7 @@ export const CartItem = ({ productId, product, quantity }) => {
         dispatch(removeCartItemAction(productId))
 
     }
-
+    console.log(_quantity)
     return (
         <Spin spinning={_loading}>
             <li className="list-group-item">
@@ -86,7 +96,21 @@ export const CartItem = ({ productId, product, quantity }) => {
                                     showCancel={false} placement="bottomRight" title="Thông báo" description="Bạn có chắc chắn muốn xóa sản phẩm này">
                                     <button onClick={_quantity > 1 ? onDecrement : undefined} className="btn">-</button>
                                 </Popconfirm>
-                                <input ref={inputRef} value={_quantity} onChange={ev => setQuantity(parseInt(ev.target.value) || 1)} />
+                                <input
+                                    value={_quantity}
+                                    onChange={ev => setQuantity(ev.target.value)}
+                                    onBlur={ev => {
+                                        let val = parseInt(ev.target.value)
+                                        if(!val) {
+                                            val = 1
+                                            setQuantity(val)
+                                        }
+
+                                        if(val !== quantity) {
+                                            onUpdateQuantity(val)
+                                        }
+                                    }}
+                                />
                                 <button onClick={onIncrement} className="btn">+</button>
                             </div>
                             {/* Remove */}

@@ -6,12 +6,12 @@ import { useAuth } from '@/hooks/useAuth'
 import { avatarDefault } from '@/config/assets'
 import { Dropdown, Popover } from 'antd'
 import { useDispatch } from 'react-redux'
-import { logoutAction } from '@/stories/auth'
+import { logoutAction } from '@/stores/auth'
 import { useCart } from '@/hooks/useCart'
 import { CartDrawer } from '../CartDrawer'
 import { CheckCircleFilled } from '@ant-design/icons'
 import { Button } from '../Button'
-import { cartActions } from '@/stories/cart'
+import { cartActions } from '@/stores/cart'
 
 export const Header = () => {
     const { user } = useAuth()
