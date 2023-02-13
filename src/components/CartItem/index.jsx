@@ -12,6 +12,8 @@ export const CartItem = ({ productId, product, quantity }) => {
     const [_quantity, setQuantity] = useState(quantity)
     const { loading } = useCart()
     const _loading = loading[productId] || false
+    const [openPopconfirm, setOpenpopconfirm] = useState(false)
+    const [openPopconfirmQuantity, setOpenPopconfirmQuantity] = useState(false)
 
 
     useEffect(() => {
@@ -39,8 +41,7 @@ export const CartItem = ({ productId, product, quantity }) => {
         }))
     }
 
-    const onRemoveCartItem = (ev) => {
-        ev.preventDefault()
+    const onRemoveCartItem = () => {
         dispatch(removeCartItemAction(productId))
 
     }
@@ -73,14 +74,32 @@ export const CartItem = ({ productId, product, quantity }) => {
                         <div className="d-flex align-items-center">
                             {/* Select */}
                             <div className="btn-group btn-quantity">
-                                <Popconfirm onConfirm={onRemoveCartItem} disabled={_quantity > 1} okText="Xóa" showCancel={false} placement="bottomRight" title="Thông báo" description="Bạn có chắc chắn muốn xóa sản phẩm này" onConfirm={onRemoveCartItem}>
+                                <Popconfirm
+                                    open={openPopconfirmQuantity}
+                                    onOpenChange={visible => setOpenPopconfirmQuantity(visible)}
+                                    onConfirm={() => {
+                                        setOpenPopconfirmQuantity(false)
+                                        onRemoveCartItem()
+                                    }}
+                                    disabled={_quantity > 1}
+                                    okText="Xóa"
+                                    showCancel={false} placement="bottomRight" title="Thông báo" description="Bạn có chắc chắn muốn xóa sản phẩm này">
                                     <button onClick={_quantity > 1 ? onDecrement : undefined} className="btn">-</button>
                                 </Popconfirm>
                                 <input ref={inputRef} value={_quantity} onChange={ev => setQuantity(parseInt(ev.target.value) || 1)} />
                                 <button onClick={onIncrement} className="btn">+</button>
                             </div>
                             {/* Remove */}
-                            <Popconfirm okText="Xóa" showCancel={false} placement="bottomRight" title="Thông báo" description="Bạn có chắc chắn muốn xóa sản phẩm này" onConfirm={onRemoveCartItem}>
+                            <Popconfirm
+                                open={openPopconfirm}
+                                onOpenChange={visible => setOpenpopconfirm(visible)}
+                                okText="Xóa"
+                                showCancel={false} placement="bottomRight" title="Thông báo"
+                                description="Bạn có chắc chắn muốn xóa sản phẩm này"
+                                onConfirm={() => {
+                                    setOpenpopconfirm(false)
+                                    onRemoveCartItem()
+                                }}>
                                 <a onClick={ev => ev.preventDefault()} className="font-size-xs text-gray-400 ml-auto" href="#!">
                                     <i className="fe fe-x" /> Xóa
                                 </a>
