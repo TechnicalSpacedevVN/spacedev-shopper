@@ -4,13 +4,11 @@ import { authReducer, authSaga, getUserAction } from './auth'
 import { cartReducer, cartSaga, getCartAction } from './cart'
 import createSagaMiddleware from 'redux-saga'
 import { all } from 'redux-saga/effects'
-import { abcSaga } from './abc'
 
 function* rootSaga(){
     yield all([
         cartSaga(),
         authSaga(),
-        abcSaga()
     ])
 }
 

@@ -1,5 +1,8 @@
 const TOKEN_KEY = 'token'
 const USER_KEY = 'user'
+const CART_KEY = 'cart'
+
+
 export const setToken = (data) => {
     localStorage.setItem(TOKEN_KEY, JSON.stringify(data))
 }
@@ -19,4 +22,15 @@ export const getUser = () => {
 }
 export const clearUser = () => {
     localStorage.removeItem(USER_KEY)
+}
+
+
+export const setCart = (data) => {
+    localStorage.setItem(CART_KEY, JSON.stringify(data))
+}
+export const getCart = () => {
+    return JSON.parse(localStorage.getItem(CART_KEY)) 
+}
+export const clearCart = () => {
+    localStorage.removeItem(CART_KEY)
 }

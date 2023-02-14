@@ -1,23 +1,14 @@
+
 import { authService } from "@/services/auth"
 import { userService } from "@/services/user"
-import { clearToken, clearUser, getToken, getUser, setToken, setUser } from "@/utils/token"
-import { createAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { cartActions, getCartAction } from "./cart"
-import { call, put, takeLatest } from "redux-saga/effects"
 import { handleError } from "@/utils"
+import { clearToken, clearUser, getToken, setToken, setUser } from "@/utils/token"
+import { call, put } from "redux-saga/effects"
+import { authActions, loginSuccessAction } from "."
 
-const initialState = {
-    user: getUser(),
-    status: 'idle',
-    loginLoading: false
-}
 
-export const loginAction = createAction('auth/login')
-export const logoutAction = createAction('auth/actionLogout')
-export const setUserAction = createAction('auth/setUserAction')
-export const loginByCodeAction = createAction('auth/loginByCode')
-export const getUserAction = createAction('auth/getUser')
-export const loginSuccessAction = createAction('auth/loginSuccess')
+
+
 
 // export const loginAction = createAsyncThunk('auth/login', async (data, thunkApi) => {
 // try {
@@ -72,40 +63,7 @@ export const loginSuccessAction = createAction('auth/loginSuccess')
 // clearToken()
 // })
 
-
-export const { reducer: authReducer, actions: authActions } = createSlice({
-    initialState,
-    name: 'auth',
-    reducers: {
-        logout: (state) => {
-            state.user = null
-        },
-        setUser: (state, action) => {
-            state.user = action.payload
-        }
-    },
-    // extraReducers: (builder) => {
-    //     builder.addCase(loginAction.pending, (state) => {
-    //         state.loginLoading = true
-    //     })
-
-    //     builder.addCase(loginAction.fulfilled, (state, action) => {
-    //         state.user = action.payload
-    //         state.loginLoading = false
-    //     })
-
-    //     builder.addCase(loginAction.rejected, (state) => {
-    //         state.loginLoading = false
-    //     })
-
-    //     builder.addCase(loginByCodeAction.fulfilled, (state, action) => {
-    //         state.user = action.payload
-    //     })
-    // }
-})
-
-
-function* fetchLogin(action) {
+export function* fetchLogin(action) {
     try {
         const res = yield call(authService.login, action.payload)
         setToken(res.data)
@@ -125,7 +83,7 @@ function* fetchLogin(action) {
     }
 }
 
-function* logout() {
+export function* logout() {
     yield put(authActions.logout())
     // yield put(cartActions.setCart(null))
     // thunkApi.dispatch(authActions.logout())
@@ -134,7 +92,7 @@ function* logout() {
     clearToken()
 }
 
-function* fetchUser() {
+export function* fetchUser() {
     try {
         if (getToken()) {
             const user = yield call(userService.getUser)
@@ -147,14 +105,14 @@ function* fetchUser() {
     }
 }
 
-function* setUserSaga(action) {
+export function* setUserSaga(action) {
     setUser(action.payload)
     // thunkApi.dispatch(authActions.setUser(user))
     yield put(authActions.setUser(user))
 }
 
 
-function* fetchLoginByCode(action) {
+export function* fetchLoginByCode(action) {
     try {
         const res = yield call(authService.loginByCode, { code })
         setToken(res.data)
@@ -165,11 +123,4 @@ function* fetchLoginByCode(action) {
     } catch (err) {
         handleError(err)
     }
-}
-export function* authSaga() {
-    yield takeLatest(loginAction, fetchLogin)
-    yield takeLatest(logoutAction, logout)
-    yield takeLatest(getUserAction, fetchUser)
-    yield takeLatest(setUserAction, setUserSaga)
-    yield takeLatest(loginByCodeAction, fetchLoginByCode)
 }
