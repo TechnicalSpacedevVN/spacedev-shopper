@@ -64,7 +64,6 @@ export const CartItem = ({ allowSelect, productId, product, quantity }) => {
         }))
     }
 
-    console.log(_quantity)
     return (
         <Spin spinning={_loading}>
             <li className="list-group-item">

@@ -2,7 +2,7 @@ import { cartService } from "@/services/cart";
 import { getToken, handleError, setCart } from "@/utils";
 import { call, delay, put, race, select, take } from 'redux-saga/effects';
 import { authActions } from "../auth";
-import { cartActions, getCartAction, getInitialState } from ".";
+import { cartActions, getCartAction, updateCartItemAction, removeCartItemAction, updateItemQuantitySuccessAction } from ".";
 
 export function* fetchCartItem(action) {
     try {
@@ -21,6 +21,7 @@ export function* fetchCartItem(action) {
                     behavior: 'smooth'
                 })
             }
+            yield put(updateItemQuantitySuccessAction(action.payload.productId))
         } else {
             yield put(removeCartItemAction(action.payload.productId))
         }
@@ -37,7 +38,7 @@ export function* fetchRemoveItem(action) {
         yield call(cartService.removeItem, action.payload)
         yield put(getCartAction())
         yield put(cartActions.toggleProductLoading({ productId: action.payload, loading: false }))
-
+        yield put(updateItemQuantitySuccessAction(action.payload))
     } catch (err) {
         console.error(err)
     }
@@ -55,7 +56,6 @@ export function* fetchCart() {
             yield put(cartActions.setCart(cart.data))
         }
 
-        console.log({ cart, logout })
         // thunkApi.dispatch(cartActions.setCart(cart.data))
         // return cart
     }
@@ -99,11 +99,19 @@ export function* fetchSelectCartItem(action) {
 }
 
 export function* fetchPreCheckout(action) {
+
     try {
         let { cart: { preCheckoutData } } = yield select()
-        const res  = yield call(cartService.preCheckout, preCheckoutData)
+        if(action.type === updateItemQuantitySuccessAction.toString()) {
+            let productId = action.payload
+            if(!preCheckoutData.listItems.find(e => e === productId)) return
+        }
+
+        
+        const res = yield call(cartService.preCheckout, preCheckoutData)
         yield put(cartActions.setPreCheckoutResponse(res.data))
-    }catch(err) {
+
+    } catch (err) {
         handleError(err)
     }
 }
