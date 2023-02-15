@@ -1,7 +1,7 @@
 import { createAction, createSlice } from "@reduxjs/toolkit";
 import { takeLatest } from 'redux-saga/effects';
 import { loginSuccessAction, logoutAction } from "../auth";
-import { clearCart, fetchCart, fetchCartItem, fetchRemoveItem, setCartSaga } from "./saga";
+import { clearCart, fetchCart, fetchCartItem, fetchPreCheckout, fetchRemoveItem, fetchSelectCartItem, setCartSaga } from "./saga";
 import { getCart } from "@/utils";
 
 
@@ -13,6 +13,10 @@ export const { reducer: cartReducer, actions: cartActions, name, getInitialState
         return {
             cart: getCart(),
             openCartOver: false,
+            preCheckoutData: {
+                listItems: []
+            },
+            preCheckoutResponse: null,
             loading: {
                 // 234234: true
             }
@@ -27,6 +31,12 @@ export const { reducer: cartReducer, actions: cartActions, name, getInitialState
         },
         toggleProductLoading(state, action) {
             state.loading[action.payload.productId] = action.payload.loading
+        },
+        setPreCheckoutData(state, action) {
+            state.preCheckoutData = action.payload
+        },
+        setPreCheckoutResponse(state, action) {
+            state.preCheckoutResponse = action.payload
         }
     }
 })
@@ -34,6 +44,7 @@ export const { reducer: cartReducer, actions: cartActions, name, getInitialState
 export const updateCartItemAction = createAction(`${name}/addCartItem`)
 export const removeCartItemAction = createAction(`${name}/removeItem`)
 export const getCartAction = createAction(`${name}/getCart`)
+export const toggleCheckoutItemAction = createAction(`${name}/selectCartItem`)
 
 
 
@@ -45,4 +56,6 @@ export function* cartSaga() {
     yield takeLatest([getCartAction, loginSuccessAction], fetchCart)
     yield takeLatest(logoutAction, clearCart)
     yield takeLatest(cartActions.setCart, setCartSaga)
+    yield takeLatest(toggleCheckoutItemAction, fetchSelectCartItem)
+    yield takeLatest(cartActions.setPreCheckoutData, fetchPreCheckout)
 }

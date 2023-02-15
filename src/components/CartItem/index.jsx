@@ -1,12 +1,13 @@
-import { removeCartItemAction, updateCartItemAction } from "@/stores/cart"
+import { removeCartItemAction, toggleCheckoutItemAction, updateCartItemAction } from "@/stores/cart"
 import { currency } from "@/utils"
 import { useEffect, useRef, useState } from "react"
 import { useDispatch } from "react-redux"
 import { Popconfirm } from "../Popconfirm"
 import { useCart } from "@/hooks/useCart"
 import { Spin } from "antd"
+import { Checkbox } from "../Checkout"
 
-export const CartItem = ({ productId, product, quantity }) => {
+export const CartItem = ({ allowSelect, productId, product, quantity }) => {
     const dispatch = useDispatch()
     // const inputRef = useRef()
     const [_quantity, setQuantity] = useState(quantity)
@@ -55,13 +56,25 @@ export const CartItem = ({ productId, product, quantity }) => {
         dispatch(removeCartItemAction(productId))
 
     }
+
+    const onSelectCartItemn = (checked) => {
+        dispatch(toggleCheckoutItemAction({
+            productId,
+            checked
+        }))
+    }
+
     console.log(_quantity)
     return (
         <Spin spinning={_loading}>
             <li className="list-group-item">
                 <div className="row align-items-center">
+                    {
+                        allowSelect && <Checkbox onChange={onSelectCartItemn}/>
+                    }
                     <div className="w-[120px]">
                         {/* Image */}
+
                         <a href="./product.html">
                             <img className="img-fluid" src={product.thumbnail_url} alt="..." />
                         </a>
@@ -101,12 +114,12 @@ export const CartItem = ({ productId, product, quantity }) => {
                                     onChange={ev => setQuantity(ev.target.value)}
                                     onBlur={ev => {
                                         let val = parseInt(ev.target.value)
-                                        if(!val) {
+                                        if (!val) {
                                             val = 1
                                             setQuantity(val)
                                         }
 
-                                        if(val !== quantity) {
+                                        if (val !== quantity) {
                                             onUpdateQuantity(val)
                                         }
                                     }}

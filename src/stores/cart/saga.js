@@ -1,6 +1,6 @@
 import { cartService } from "@/services/cart";
-import { getToken, setCart } from "@/utils";
-import { call, delay, put, race, take } from 'redux-saga/effects';
+import { getToken, handleError, setCart } from "@/utils";
+import { call, delay, put, race, select, take } from 'redux-saga/effects';
 import { authActions } from "../auth";
 import { cartActions, getCartAction, getInitialState } from ".";
 
@@ -68,4 +68,42 @@ export function* clearCart() {
 
 export function* setCartSaga(action) {
     setCart(action.payload)
+}
+
+export function* fetchSelectCartItem(action) {
+
+    try {
+        let { cart: { preCheckoutData: { listItems } } } = yield select()
+        // const { preCheckoutData } = cart
+        // const { listItems } = preCheckoutData
+        listItems = [...listItems]
+
+        const {
+            productId,
+            checked
+        } = action.payload
+
+        if (checked) {
+            listItems.push(productId)
+        } else {
+            listItems = listItems.filter(e => e !== productId)
+        }
+
+        yield put(cartActions.setPreCheckoutData({
+            listItems
+        }))
+
+    } catch (err) {
+        handleError(err)
+    }
+}
+
+export function* fetchPreCheckout(action) {
+    try {
+        let { cart: { preCheckoutData } } = yield select()
+        const res  = yield call(cartService.preCheckout, preCheckoutData)
+        yield put(cartActions.setPreCheckoutResponse(res.data))
+    }catch(err) {
+        handleError(err)
+    }
 }

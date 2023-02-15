@@ -35,7 +35,7 @@ export const CartDrawer = ({ open, onClose }) => {
                                 <strong>Subtotal</strong> <strong className="ml-auto">{currency(cart?.subTotal)}</strong>
                             </div>
                             {/* Buttons */}
-                            <div className="modal-body"><a className="btn btn-block btn-outline-dark" href="./shopping-cart.html">View Cart</a>
+                            <div className="modal-body"><Link className="btn btn-block btn-outline-dark" onClick={onClose} to={PATH.ViewCart}>View Cart</Link>
                             </div>
                         </div>
                     ) :

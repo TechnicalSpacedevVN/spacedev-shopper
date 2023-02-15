@@ -8,6 +8,7 @@ import { ProductPage } from "@/pages/san-pham";
 import { profile } from "./ca-nhan";
 import { GuestRoute } from "@/components/GuestRoute";
 import { Account } from "@/pages/tai-khoan";
+import { ViewCart } from "@/pages/gio-hang";
 
 export const routes = [
     {
@@ -28,6 +29,10 @@ export const routes = [
             {
                 element: <ProductDetailPage />,
                 path: PATH.ProductDetail
+            },
+            {
+                element: <ViewCart />,
+                path: PATH.ViewCart
             },
             {
                 element: <PrivateRoute redirect={PATH.Account}/>,
