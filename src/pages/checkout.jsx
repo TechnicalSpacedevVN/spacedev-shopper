@@ -1,20 +1,43 @@
 import { AddressCard } from '@/components/AddressCard'
 import { AddressDrawer } from '@/components/AddressDrawer'
+import { Button } from '@/components/Button'
 import { CartItem } from '@/components/CartItem'
+import { Field } from '@/components/Field'
+import { Radio } from '@/components/Radio'
 import { PATH } from '@/config'
 import { useCart } from '@/hooks/useCart'
+import { useForm } from '@/hooks/useForm'
 import { useQuery } from '@/hooks/useQuery'
+import { cartService } from '@/services/cart'
 import { userService } from '@/services/user'
-import { currency } from '@/utils'
+import { cartActions } from '@/stores/cart'
+import { currency, regexp, required } from '@/utils'
+import { Spin } from 'antd'
 import React from 'react'
 import { useState } from 'react'
+import { useRef } from 'react'
 import { useEffect } from 'react'
+import { useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 
+
+const addressRules = {
+    fullName: [required()],
+    email: [required(), regexp('email')],
+    phone: [required(), regexp('phone')],
+    province: [required()],
+    district: [required()],
+    address: [required()]
+}
+
 export const Checkout = () => {
-    const { preCheckoutResponse } = useCart()
+    const { preCheckoutResponse, preCheckoutLoading, preCheckoutData } = useCart()
+    const paymentMethodRef = useRef('money')
+    const noteRef = useRef('')
+
     const [openAddressDrawer, setOpenAddressDrawer] = useState(false)
     const [address, setAddress] = useState()
+    const dispatch = useDispatch()
 
     const { loading: addressLoading } = useQuery({
         queryFn: () => userService.getAddress('?default=true'),
@@ -25,6 +48,15 @@ export const Checkout = () => {
         }
     })
 
+    const { loading: shippingLoading, data: shippingMethods } = useQuery({
+        queryFn: () => cartService.getShippingMethod()
+    })
+    const { loading, refetch: checkoutService } = useQuery({
+        queryFn: ({ params }) => cartService.checkout(...params)
+    })
+
+    const addressForm = useForm(addressRules)
+
     const navigate = useNavigate()
     useEffect(() => {
         if (!preCheckoutResponse.listItems) {
@@ -34,6 +66,45 @@ export const Checkout = () => {
 
     const { listItems } = preCheckoutResponse
     // const address = addressDefault?.data?.[0]
+
+    const onPlaceOrder = async () => {
+        let _address = address
+
+        if (!_address) {
+            if (addressForm.validate()) {
+                // ...
+                _address = addressForm.values
+            } else {
+                return
+            }
+        }
+
+        // Checkout
+
+        const order = await checkoutService({
+            shipping: {
+                shippingMethod: preCheckoutResponse.shipping.shippingMethod,
+                ..._address
+            },
+            listItems: preCheckoutData.listItems,
+            promotionCode: preCheckoutData.promotionCode,
+            payment: {
+                paymentMethod: paymentMethodRef.current
+            },
+            note: noteRef.current
+        })
+
+        dispatch(cartActions.clearCart())
+
+        if (!address) {
+            userService.addAddress(_address)
+        }
+
+        navigate(PATH.OrderComplete, { state: order.data })
+
+    }
+
+    const { promotion } = preCheckoutResponse
 
     return (
         <>
@@ -68,40 +139,47 @@ export const Checkout = () => {
                                         ) : (
                                             <div className="row">
                                                 <div className="col-12">
-                                                    <div className="form-group">
-                                                        <label htmlFor="firstName">Full Name *</label>
-                                                        <input className="form-control" id="firstName" type="text" placeholder="First Name" required />
-                                                    </div>
+                                                    <Field
+                                                        label="Full Name *"
+                                                        placeholder="Full Name *"
+                                                        {...addressForm.register('fullName')}
+                                                    />
+
                                                 </div>
                                                 <div className="col-12 col-md-6">
-                                                    <div className="form-group">
-                                                        <label htmlFor="mobilePhone">Phone Number*</label>
-                                                        <input className="form-control" id="mobilePhone" type="tel" placeholder="Phone Number*" required />
-                                                    </div>
+                                                    <Field
+                                                        label="Phone Number*"
+                                                        placeholder="Phone Number*"
+                                                        {...addressForm.register('phone')}
+                                                    />
                                                 </div>
                                                 <div className="col-12 col-md-6">
-                                                    <div className="form-group">
-                                                        <label htmlFor="emailAddress">Email Address *</label>
-                                                        <input className="form-control" id="emailAddress" type="email" placeholder="Email Address" required />
-                                                    </div>
+                                                    <Field
+                                                        label="Email Address *"
+                                                        placeholder="Email Address *"
+                                                        {...addressForm.register('email')}
+                                                    />
                                                 </div>
                                                 <div className="col-12 col-md-6">
-                                                    <div className="form-group">
-                                                        <label htmlFor="country">District *</label>
-                                                        <input className="form-control" id="country" type="text" placeholder="Country" required />
-                                                    </div>
+                                                    <Field
+                                                        label="District *"
+                                                        placeholder="District *"
+                                                        {...addressForm.register('district')}
+                                                    />
                                                 </div>
                                                 <div className="col-12 col-md-6">
-                                                    <div className="form-group">
-                                                        <label htmlFor="companyName">Province / City *</label>
-                                                        <input className="form-control" id="companyName" type="text" placeholder="Province / City*" required />
-                                                    </div>
+                                                    <Field
+                                                        label="Province / City *"
+                                                        placeholder="Province / City *"
+                                                        {...addressForm.register('province')}
+                                                    />
                                                 </div>
                                                 <div className="col-12">
-                                                    <div className="form-group">
-                                                        <label htmlFor="addressLineOne">Address *</label>
-                                                        <input className="form-control" id="addressLineOne" type="text" placeholder="Address Line 1" required />
-                                                    </div>
+                                                    <Field
+                                                        label="Address *"
+                                                        placeholder="Address *"
+                                                        {...addressForm.register('address')}
+                                                    />
                                                 </div>
                                             </div>
                                         )
@@ -110,125 +188,48 @@ export const Checkout = () => {
                                 <h6 className="mb-7">Shipping Method</h6>
                                 {/* Shipping details */}
                                 <div className="table-responsive mb-6">
-                                    <table className="table table-bordered table-sm table-hover mb-0">
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <div className="custom-control custom-radio">
-                                                        <input className="custom-control-input" id="checkoutShippingStandard" name="shipping" type="radio" />
-                                                        <label className="custom-control-label text-body text-nowrap" htmlFor="checkoutShippingStandard">
-                                                            Giao hàng tiêu chuẩn
-                                                        </label>
-                                                    </div>
-                                                </td>
-                                                <td>Delivery in 5 - 7 working days</td>
-                                                <td>$8.00</td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div className="custom-control custom-radio">
-                                                        <input className="custom-control-input" id="checkoutShippingExpress" name="shipping" type="radio" />
-                                                        <label className="custom-control-label text-body text-nowrap" htmlFor="checkoutShippingExpress">
-                                                            Giao hàng nhanh
-                                                        </label>
-                                                    </div>
-                                                </td>
-                                                <td>Delivery in 3 - 5 working days</td>
-                                                <td>$12.00</td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div className="custom-control custom-radio">
-                                                        <input className="custom-control-input" id="checkoutShippingFree" name="shipping" type="radio" />
-                                                        <label className="custom-control-label text-body text-nowrap" htmlFor="checkoutShippingFree">
-                                                            Giao hàng miễn phí
-                                                        </label>
-                                                    </div>
-                                                </td>
-                                                <td>Living won't the He one every subdue
-                                                    meat replenish face was you morning
-                                                    firmament darkness.</td>
-                                                <td>$0.00</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                    <Radio.Group onChange={val => dispatch(cartActions.changeShippingMethod(val))} defaultValue={preCheckoutResponse?.shipping?.shippingMethod}>
+                                        <table className="table table-bordered table-sm table-hover mb-0">
+                                            <tbody>
+                                                {
+                                                    shippingMethods?.data?.map(e => (
+                                                        <tr>
+                                                            <td className="whitespace-nowrap">
+                                                                <Radio value={e.code}>{e.title}</Radio>
+                                                            </td>
+                                                            <td>{e.description}</td>
+                                                            <td>{currency(e.price)}</td>
+                                                        </tr>
+                                                    ))
+                                                }
+
+
+                                            </tbody>
+                                        </table>
+                                    </Radio.Group>
                                 </div>
                                 {/* Heading */}
                                 <h6 className="mb-7">Payment</h6>
                                 {/* List group */}
-                                <div className="list-group list-group-sm mb-7">
-                                    <div className="list-group-item">
-                                        {/* Radio */}
-                                        <div className="custom-control custom-radio">
-                                            {/* Input */}
-                                            <input className="custom-control-input" id="checkoutPaymentCard" name="payment" type="radio" data-toggle="collapse" data-action="show" data-target="#checkoutPaymentCardCollapse" />
-                                            {/* Label */}
-                                            <label className="custom-control-label font-size-sm text-body text-nowrap" htmlFor="checkoutPaymentCard">
-                                                Credit Card <img className="ml-2" src="./img/brands/color/cards.svg" alt="..." />
-                                            </label>
+                                <Radio.Group onChange={val => paymentMethodRef.current = val} defaultValue="money">
+                                    <div className="list-group list-group-sm mb-7">
+                                        <div className="list-group-item">
+                                            {/* Radio */}
+                                            <Radio value="card">
+                                                Credit Card <img className="ml-2" src="/img/brands/color/cards.svg" alt="..." />
+                                            </Radio>
                                         </div>
-                                    </div>
-                                    <div className="list-group-item collapse py-0" id="checkoutPaymentCardCollapse">
-                                        {/* Form */}
-                                        <div className="form-row py-5">
-                                            <div className="col-12">
-                                                <div className="form-group mb-4">
-                                                    <label className="sr-only" htmlFor="checkoutPaymentCardNumber">Card Number</label>
-                                                    <input className="form-control form-control-sm" id="checkoutPaymentCardNumber" type="text" placeholder="Card Number *" required />
-                                                </div>
-                                            </div>
-                                            <div className="col-12">
-                                                <div className="form-group mb-4">
-                                                    <label className="sr-only" htmlFor="checkoutPaymentCardName">Name on Card</label>
-                                                    <input className="form-control form-control-sm" id="checkoutPaymentCardName" type="text" placeholder="Name on Card *" required />
-                                                </div>
-                                            </div>
-                                            <div className="col-12 col-md-4">
-                                                <div className="form-group mb-md-0">
-                                                    <label className="sr-only" htmlFor="checkoutPaymentMonth">Month</label>
-                                                    <select className="custom-select custom-select-sm" id="checkoutPaymentMonth">
-                                                        <option>January</option>
-                                                        <option>February</option>
-                                                        <option>March</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div className="col-12 col-md-4">
-                                                <div className="form-group mb-md-0">
-                                                    <label className="sr-only" htmlFor="checkoutPaymentCardYear">Year</label>
-                                                    <select className="custom-select custom-select-sm" id="checkoutPaymentCardYear">
-                                                        <option>2017</option>
-                                                        <option>2018</option>
-                                                        <option>2019</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div className="col-12 col-md-4">
-                                                <div className="input-group input-group-merge">
-                                                    <input className="form-control form-control-sm" id="checkoutPaymentCardCVV" type="text" placeholder="CVV *" required />
-                                                    <div className="input-group-append">
-                                                        <span className="input-group-text" data-toggle="popover" data-placement="top" data-trigger="hover" data-content="The CVV Number on your credit card or debit card is a 3 digit number on VISA, MasterCard and Discover branded credit and debit cards.">
-                                                            <i className="fe fe-help-circle" />
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="list-group-item">
-                                        {/* Radio */}
-                                        <div className="custom-control custom-radio">
-                                            {/* Input */}
-                                            <input className="custom-control-input" id="checkoutPaymentPaypal" name="payment" type="radio" data-toggle="collapse" data-action="hide" data-target="#checkoutPaymentCardCollapse" />
-                                            {/* Label */}
-                                            <label className="custom-control-label font-size-sm text-body text-nowrap" htmlFor="checkoutPaymentPaypal">
+                                        <div className="list-group-item">
+                                            {/* Radio */}
+                                            <Radio value="money">
                                                 Trả tiền khi nhận hàng
-                                            </label>
+                                            </Radio>
                                         </div>
                                     </div>
-                                </div>
+                                </Radio.Group>
+
                                 {/* Notes */}
-                                <textarea className="form-control form-control-sm mb-9 mb-md-0 font-size-xs" rows={5} placeholder="Order Notes (optional)" defaultValue={""} />
+                                <textarea onChange={ev => noteRef.current = ev.target.value} className="form-control form-control-sm mb-9 mb-md-0 font-size-xs" rows={5} placeholder="Order Notes (optional)" defaultValue={""} />
                             </div>
                             <div className="col-12 col-md-5 col-lg-4 offset-lg-1">
                                 {/* Heading */}
@@ -266,25 +267,27 @@ export const Checkout = () => {
                                 </div>
                                 {/* Card */}
                                 <div className="product-card card mb-9 bg-light">
-                                    <div className="card-body">
-                                        <ul className="list-group list-group-sm list-group-flush-y list-group-flush-x">
-                                            <li className="list-group-item d-flex">
-                                                <span>Subtotal</span> <span className="ml-auto font-size-sm">$89.00</span>
-                                            </li>
-                                            <li className="list-group-item d-flex">
-                                                <span>Promotion</span> <span className="ml-auto font-size-sm">-$44.50</span>
-                                            </li>
-                                            <li className="list-group-item d-flex">
-                                                <span>Shipping</span> <span className="ml-auto font-size-sm">$8.00</span>
-                                            </li>
-                                            <li className="list-group-item d-flex">
-                                                <span>Tax</span> <span className="ml-auto font-size-sm">$00.00</span>
-                                            </li>
-                                            <li className="list-group-item d-flex font-size-lg font-weight-bold">
-                                                <span>Total</span> <span className="ml-auto">$97.00</span>
-                                            </li>
-                                        </ul>
-                                    </div>
+                                    <Spin spinning={preCheckoutLoading}>
+                                        <div className="card-body">
+                                            <ul className="list-group list-group-sm list-group-flush-y list-group-flush-x">
+                                                <li className="list-group-item d-flex">
+                                                    <span>Subtotal</span> <span className="ml-auto font-size-sm">{currency(preCheckoutResponse?.subTotal)}</span>
+                                                </li>
+                                                <li className="list-group-item d-flex">
+                                                    <span>Promotion</span> <span className="ml-auto font-size-sm">{promotion?.discount > 0 ? '-' : undefined}{currency(promotion?.discount)}</span>
+                                                </li>
+                                                <li className="list-group-item d-flex">
+                                                    <span>Shipping</span> <span className="ml-auto font-size-sm">{currency(preCheckoutResponse?.shipping?.shippingPrice)}</span>
+                                                </li>
+                                                <li className="list-group-item d-flex">
+                                                    <span>Tax</span> <span className="ml-auto font-size-sm">{currency(preCheckoutResponse?.tax)}</span>
+                                                </li>
+                                                <li className="list-group-item d-flex font-size-lg font-weight-bold">
+                                                    <span>Total</span> <span className="ml-auto font-size-sm">{currency(preCheckoutResponse?.total)}</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </Spin>
                                 </div>
                                 {/* Disclaimer */}
                                 <p className="mb-7 font-size-xs text-gray-500">
@@ -293,9 +296,9 @@ export const Checkout = () => {
                                     described in our privacy policy.
                                 </p>
                                 {/* Button */}
-                                <a href="./order-completed.html" className="btn btn-block btn-dark">
+                                <Button loading={loading} className="w-full" onClick={onPlaceOrder}>
                                     Place Order
-                                </a>
+                                </Button>
                             </div>
                         </div>
                     </div>

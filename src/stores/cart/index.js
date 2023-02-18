@@ -15,7 +15,8 @@ export const { reducer: cartReducer, actions: cartActions, name, getInitialState
             openCartOver: false,
             preCheckoutData: {
                 promotionCode: [],
-                listItems: []
+                listItems: [],
+                shippingMethod: 'mien-phi'
             },
             preCheckoutResponse: {},
             preCheckoutLoading: false,
@@ -26,6 +27,22 @@ export const { reducer: cartReducer, actions: cartActions, name, getInitialState
         }
     },
     reducers: {
+        clearCart(state) {
+            return {
+                ...state,
+                openCartOver: false,
+                preCheckoutData: {
+                    promotionCode: [],
+                    listItems: [],
+                    shippingMethod: 'mien-phi'
+                },
+                preCheckoutResponse: {},
+                preCheckoutLoading: false,
+                promotionLoading: false,
+                loading: {
+                }
+            }
+        },
         setCart(state, action) {
             state.cart = action.payload
         },
@@ -47,6 +64,9 @@ export const { reducer: cartReducer, actions: cartActions, name, getInitialState
             } else {
                 state.preCheckoutData.promotionCode = []
             }
+        },
+        changeShippingMethod(state, action) {
+            state.preCheckoutData.shippingMethod = action.payload
         },
         setPreCheckoutData(state, action) {
             state.preCheckoutData = action.payload
@@ -71,13 +91,14 @@ export function* cartSaga() {
     // yield takeLatest('cart/getCart/pending', getCart)
     yield takeLatest(updateCartItemAction, fetchCartItem)
     yield takeLatest(removeCartItemAction, fetchRemoveItem)
-    yield takeLatest([getCartAction, loginSuccessAction], fetchCart)
+    yield takeLatest([getCartAction, loginSuccessAction, cartActions.clearCart], fetchCart)
     yield takeLatest(logoutAction, clearCart)
     yield takeLatest(cartActions.setCart, setCartSaga)
     yield takeLatest(toggleCheckoutItemAction, fetchSelectCartItem)
-    yield takeLatest([cartActions.setPreCheckoutData, updateItemQuantitySuccessAction, cartActions.togglePromotionCode], fetchPreCheckout)
+    yield takeLatest([cartActions.setPreCheckoutData, updateItemQuantitySuccessAction, cartActions.togglePromotionCode, cartActions.changeShippingMethod], fetchPreCheckout)
 
     // Promotion
     yield takeLatest(addPromotionAction, fetchAddPromotion)
     yield takeLatest(removePromotionAction, removePromotion)
+
 }

@@ -10,6 +10,7 @@ import { GuestRoute } from "@/components/GuestRoute";
 import { Account } from "@/pages/tai-khoan";
 import { ViewCart } from "@/pages/gio-hang";
 import { Checkout } from "@/pages/checkout";
+import { OrderComplete } from "@/pages/dat-hang-thanh-cong";
 
 export const routes = [
     {
@@ -38,6 +39,11 @@ export const routes = [
             {
                 element: <Checkout />,
                 path: PATH.Checkout
+            },
+            {
+                element: <OrderComplete />,
+                path: PATH.OrderComplete,
+                forceRefresh: true
             },
             {
                 element: <PrivateRoute redirect={PATH.Account}/>,
