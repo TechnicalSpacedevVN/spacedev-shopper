@@ -9,6 +9,7 @@ import { profile } from "./ca-nhan";
 import { GuestRoute } from "@/components/GuestRoute";
 import { Account } from "@/pages/tai-khoan";
 import { ViewCart } from "@/pages/gio-hang";
+import { Checkout } from "@/pages/checkout";
 
 export const routes = [
     {
@@ -33,6 +34,10 @@ export const routes = [
             {
                 element: <ViewCart />,
                 path: PATH.ViewCart
+            },
+            {
+                element: <Checkout />,
+                path: PATH.Checkout
             },
             {
                 element: <PrivateRoute redirect={PATH.Account}/>,

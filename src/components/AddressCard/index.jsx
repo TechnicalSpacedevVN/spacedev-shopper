@@ -4,7 +4,7 @@ import { withLoading } from '@/utils/withLoading'
 import { withListLoading } from '@/utils/withListLoading'
 import { Button } from '../Button'
 import { AddressCardStyle } from './style'
-import { handleError } from '@/utils'
+import { cn, handleError } from '@/utils'
 import { userService } from '@/services/user'
 import { message } from 'antd'
 import { Link, generatePath } from 'react-router-dom'
@@ -33,9 +33,9 @@ const AddressCardLoading = () => {
     )
 }
 
-export const AddressCard = withLoading(({ onDeleteAddress, onChangeAddressDefault, _id, fullName, email, phone, province, district, address, default: addressDefault }) => {
+export const AddressCard = withLoading(({ action, className, hideAction, onDeleteAddress, onChangeAddressDefault, _id, fullName, email, phone, province, district, address, default: addressDefault }) => {
     // const flagRemoveAddressRef = useRef(false)
-    
+
     const _onDeleteAddress = useAction({
         service: () => userService.removeAddress(_id),
         loadingMessage: 'Đang xóa địa chỉ',
@@ -97,7 +97,7 @@ export const AddressCard = withLoading(({ onDeleteAddress, onChangeAddressDefaul
     return (
         <AddressCardStyle className="col-12">
             {/* Card */}
-            <div className="card card-lg bg-light mb-8">
+            <div className={cn("card card-lg bg-light mb-8", className)}>
                 <div className="card-body">
                     {/* Text */}
                     <p className="font-size-sm mb-0 leading-[35px]">
@@ -108,34 +108,43 @@ export const AddressCard = withLoading(({ onDeleteAddress, onChangeAddressDefaul
                         <b>Tỉnh / thành phố:</b> {province} <br />
                         <b>Địa chỉ:</b> {address}
                     </p>
-                    <div className="card-action-right-bottom">
-                        {
-                            addressDefault ? <div className="color-success cursor-pointer">
-                                Địa chỉ mặc định
-                            </div> : (
-                                <Button onClick={_onChangeAddressDefault} outline className="hidden btn-change-default btn-xs">
-                                    Đặt làm địa chỉ mặc định
-                                </Button>
-                            )
-                        }
+                    {
+                        !hideAction && (
+                            <div className="card-action-right-bottom">
+                                {
+                                    addressDefault ? <div className="color-success cursor-pointer">
+                                        Địa chỉ mặc định
+                                    </div> : (
+                                        <Button onClick={_onChangeAddressDefault} outline className="hidden btn-change-default btn-xs">
+                                            Đặt làm địa chỉ mặc định
+                                        </Button>
+                                    )
+                                }
 
 
-                    </div>
+                            </div>
+                        )
+                    }
 
+                    {
+                        !hideAction && (
+                            <div className="card-action card-action-right flex gap-2">
+                                {/* Button */}
+                                <Link className="btn btn-xs btn-circle btn-white-primary" to={generatePath(PATH.Profile.EditAddress, { id: _id })}>
+                                    <i className="fe fe-edit-2" />
+                                </Link>
+                                {
+                                    !addressDefault && <button onClick={_onDeleteAddress} className="btn btn-xs btn-circle btn-white-primary" href="account-address-edit.html">
+                                        <i className="fe fe-x" />
+                                    </button>
+                                }
 
-                    {/* Action */}
-                    <div className="card-action card-action-right flex gap-2">
-                        {/* Button */}
-                        <Link className="btn btn-xs btn-circle btn-white-primary" to={generatePath(PATH.Profile.EditAddress, { id: _id })}>
-                            <i className="fe fe-edit-2" />
-                        </Link>
-                        {
-                            !addressDefault && <button onClick={_onDeleteAddress} className="btn btn-xs btn-circle btn-white-primary" href="account-address-edit.html">
-                                <i className="fe fe-x" />
-                            </button>
-                        }
+                            </div>
+                        )
+                    }
 
-                    </div>
+                    {action}
+
                 </div>
             </div>
         </AddressCardStyle>
