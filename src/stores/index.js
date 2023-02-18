@@ -5,7 +5,7 @@ import { cartReducer, cartSaga, getCartAction } from './cart'
 import createSagaMiddleware from 'redux-saga'
 import { all } from 'redux-saga/effects'
 
-function* rootSaga(){
+function* rootSaga() {
     yield all([
         cartSaga(),
         authSaga(),
@@ -20,7 +20,7 @@ export const store = configureStore({
         cart: cartReducer
     },
     devTools: ENV === 'development',
-    middleware: getMiddleware => getMiddleware().concat(sagaMiddleware)
+    middleware: getMiddleware => getMiddleware({ serializableCheck: false }).concat(sagaMiddleware)
 })
 
 sagaMiddleware.run(rootSaga)

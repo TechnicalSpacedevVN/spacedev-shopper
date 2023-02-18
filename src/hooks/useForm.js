@@ -7,7 +7,7 @@ import { validate } from "../utils/validate"
  * @param {*} rules 
  * @return register, values, errors, validate
  */
-export const useForm = (rules, { initialValue = {}, dependencies = {} } = {}) => {
+export const useForm = (rules = {}, { initialValue = {}, dependencies = {} } = {}) => {
     const [values, setValues] = useState(initialValue)
     const [errors, setError] = useState({})
 
@@ -45,8 +45,8 @@ export const useForm = (rules, { initialValue = {}, dependencies = {} } = {}) =>
         }
     }
 
-    const _validate = () => {
-        const errorObject = validate(rules, values)
+    const _validate = (newRules) => {
+        const errorObject = validate({...rules, ...newRules}, values)
 
         setError(errorObject)
 

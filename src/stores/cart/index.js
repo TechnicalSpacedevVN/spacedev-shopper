@@ -1,7 +1,7 @@
 import { createAction, createSlice } from "@reduxjs/toolkit";
 import { takeLatest } from 'redux-saga/effects';
 import { loginSuccessAction, logoutAction } from "../auth";
-import { clearCart, fetchCart, fetchCartItem, fetchPreCheckout, fetchRemoveItem, fetchSelectCartItem, setCartSaga } from "./saga";
+import { clearCart, fetchAddPromotion, fetchCart, fetchCartItem, fetchPreCheckout, fetchRemoveItem, fetchSelectCartItem, removePromotion, setCartSaga } from "./saga";
 import { getCart } from "@/utils";
 
 
@@ -14,10 +14,12 @@ export const { reducer: cartReducer, actions: cartActions, name, getInitialState
             cart: getCart(),
             openCartOver: false,
             preCheckoutData: {
-                listItems: []
+                listItems: [],
+                promotionCode: []
             },
-            preCheckoutResponse: null,
+            preCheckoutResponse: {},
             preCheckoutLoading: false,
+            promotionLoading: false,
             loading: {
                 // 234234: true
             }
@@ -36,11 +38,21 @@ export const { reducer: cartReducer, actions: cartActions, name, getInitialState
         togglePreCheckoutLoading(state, action) {
             state.preCheckoutLoading = action.payload
         },
+        togglePromotionLoading(state, action) {
+            state.promotionLoading = action.payload
+        },
         setPreCheckoutData(state, action) {
             state.preCheckoutData = action.payload
         },
         setPreCheckoutResponse(state, action) {
             state.preCheckoutResponse = action.payload
+        },
+        togglePromotion(state, action) {
+            if (action.payload) {
+                state.preCheckoutData.promotionCode = [action.payload]
+            } else {
+                state.preCheckoutData.promotionCode = []
+            }
         }
     }
 })
@@ -50,7 +62,8 @@ export const removeCartItemAction = createAction(`${name}/removeItem`)
 export const getCartAction = createAction(`${name}/getCart`)
 export const toggleCheckoutItemAction = createAction(`${name}/selectCartItem`)
 export const updateItemQuantitySuccessAction = createAction(`${name}/updateItemQuantitySuccess`)
-
+export const addPromotionAction = createAction(`${name}/addPromotion`)
+export const removePromotionAction = createAction(`${name}/removePromotion`)
 
 export function* cartSaga() {
     console.log('cartSaga')
@@ -61,5 +74,9 @@ export function* cartSaga() {
     yield takeLatest(logoutAction, clearCart)
     yield takeLatest(cartActions.setCart, setCartSaga)
     yield takeLatest(toggleCheckoutItemAction, fetchSelectCartItem)
-    yield takeLatest([cartActions.setPreCheckoutData, updateItemQuantitySuccessAction], fetchPreCheckout)
+    yield takeLatest([cartActions.setPreCheckoutData, updateItemQuantitySuccessAction, cartActions.togglePromotion], fetchPreCheckout)
+
+    // Promotion
+    yield takeLatest(addPromotionAction, fetchAddPromotion)
+    yield takeLatest(removePromotionAction, removePromotion)
 }

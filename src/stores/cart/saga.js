@@ -73,9 +73,10 @@ export function* setCartSaga(action) {
 export function* fetchSelectCartItem(action) {
 
     try {
-        let { cart: { preCheckoutData: { listItems } } } = yield select()
+        let { cart: { preCheckoutData } } = yield select()
         // const { preCheckoutData } = cart
         // const { listItems } = preCheckoutData
+        let { listItems } = preCheckoutData
         listItems = [...listItems]
 
         const {
@@ -89,9 +90,7 @@ export function* fetchSelectCartItem(action) {
             listItems = listItems.filter(e => e !== productId)
         }
 
-        yield put(cartActions.setPreCheckoutData({
-            listItems
-        }))
+        yield put(cartActions.setPreCheckoutData({ ...preCheckoutData, listItems }))
 
     } catch (err) {
         handleError(err)
@@ -102,12 +101,12 @@ export function* fetchPreCheckout(action) {
 
     try {
         let { cart: { preCheckoutData } } = yield select()
-        if(action.type === updateItemQuantitySuccessAction.toString()) {
+        if (action.type === updateItemQuantitySuccessAction.toString()) {
             let productId = action.payload
-            if(!preCheckoutData.listItems.find(e => e === productId)) return
+            if (!preCheckoutData.listItems.find(e => e === productId)) return
         }
         yield put(cartActions.togglePreCheckoutLoading(true))
-        
+
         const res = yield call(cartService.preCheckout, preCheckoutData)
         yield put(cartActions.setPreCheckoutResponse(res.data))
 
@@ -115,5 +114,30 @@ export function* fetchPreCheckout(action) {
 
     } catch (err) {
         handleError(err)
+    }
+}
+
+export function* fetchAddPromotion(action) {
+    try {
+        yield put(cartActions.togglePromotionLoading(true))
+        yield call(cartService.getPromotion, action.payload.data)
+        yield put(cartActions.togglePromotion(action.payload.data))
+        action.payload?.onSuccess?.()
+    } catch (err) {
+        action.payload?.onError?.(err)
+    } finally {
+        yield put(cartActions.togglePromotionLoading(false))
+    }
+}
+
+export function* removePromotion(action) {
+    try {
+        yield put(cartActions.togglePromotionLoading(true))
+        yield put(cartActions.togglePromotion(action.payload.data))
+        action.payload?.onSuccess?.()
+    } catch (err) {
+
+    } finally {
+        yield put(cartActions.togglePromotionLoading(false))
     }
 }
