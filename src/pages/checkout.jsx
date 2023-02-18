@@ -14,9 +14,15 @@ import { Link, useNavigate } from 'react-router-dom'
 export const Checkout = () => {
     const { preCheckoutResponse } = useCart()
     const [openAddressDrawer, setOpenAddressDrawer] = useState(false)
+    const [address, setAddress] = useState()
 
-    const { data: addressDefault, loading: addressLoading } = useQuery({
-        queryFn: () => userService.getAddress('?default=true')
+    const { loading: addressLoading } = useQuery({
+        queryFn: () => userService.getAddress('?default=true'),
+        onSuccess: (res) => {
+            if (res?.data?.[0]) {
+                setAddress(res?.data?.[0])
+            }
+        }
     })
 
     const navigate = useNavigate()
@@ -27,11 +33,11 @@ export const Checkout = () => {
     }, [])
 
     const { listItems } = preCheckoutResponse
-    const address = addressDefault?.data?.[0]
+    // const address = addressDefault?.data?.[0]
 
     return (
         <>
-            <AddressDrawer open={openAddressDrawer} onClose={() => setOpenAddressDrawer(false)}/>
+            <AddressDrawer onSelect={setAddress} selected={address} open={openAddressDrawer} onClose={() => setOpenAddressDrawer(false)} />
             <div>
                 <section className="pt-7 pb-12">
                     <div className="container">

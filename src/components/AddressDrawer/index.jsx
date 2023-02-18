@@ -2,11 +2,15 @@ import { useQuery } from '@/hooks/useQuery'
 import { userService } from '@/services/user'
 import { Drawer } from 'antd'
 import React from 'react'
-import { ListAddressCard } from '../AddressCard'
+import { AddressCard, ListAddressCard } from '../AddressCard'
+import { cn } from '@/utils'
 
-export const AddressDrawer = ({ open, onClose }) => {
+export const AddressDrawer = ({ onSelect, selected, open, onClose }) => {
     const { data, loading } = useQuery({
-        queryFn: () => userService.getAddress()
+        queryFn: () => userService.getAddress(),
+        onSuccess: (res) => {
+            res?.data.sort(e => e.default ? -1 : 0)
+        }
     })
 
     return (
@@ -21,13 +25,25 @@ export const AddressDrawer = ({ open, onClose }) => {
                     <strong className="mx-auto">Select your address</strong>
                 </div>
                 {/* List group */}
-                <ul className="list-group list-group-lg list-group-flush">
-                    <ListAddressCard 
+                <div className="row list-group list-group-lg list-group-flush">
+                    {
+                        loading ? Array.from(Array(3)).map((_, i) => <AddressCard className="bg-white border-b !mb-0" key={i} loading />) :
+                            data?.data?.map(e => <AddressCard
+                                onClick={() => {
+                                    onSelect(e)
+                                    onClose()
+                                }}
+                                hideAction className={cn("bg-white border-b !mb-0 hover:!bg-[#eefff3] cursor-pointer", {
+                                    '!bg-[#eefff3]': selected?._id === e._id
+                                })} key={e._id} {...e} />)
+                    }
+                    {/* <ListAddressCard 
                         loading={loading}
                         loadingCount={3}
                         data={data?.data}
-                    />
-                </ul>
+                        className="bg-white border-b !mb-0"
+                    /> */}
+                </div>
                 {/* Buttons */}
                 <div className="modal-body mt-auto">
                     <a className="btn btn-block btn-outline-dark" href="./shopping-cart.html">Thêm mới</a>
