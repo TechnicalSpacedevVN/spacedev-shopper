@@ -1,7 +1,7 @@
 import { createAction, createSlice } from "@reduxjs/toolkit";
 import { takeLatest } from 'redux-saga/effects';
 import { loginSuccessAction, logoutAction } from "../auth";
-import { clearCart, fetchCart, fetchCartItem, fetchPreCheckout, fetchRemoveItem, updatePreCheckoutData, setCartSaga } from "./saga";
+import { clearCart, fetchCart, fetchCartItem, fetchPreCheckout, fetchRemoveItem, fetchSelectCartItem, setCartSaga } from "./saga";
 import { getCart } from "@/utils";
 
 
@@ -56,6 +56,6 @@ export function* cartSaga() {
     yield takeLatest([getCartAction, loginSuccessAction], fetchCart)
     yield takeLatest(logoutAction, clearCart)
     yield takeLatest(cartActions.setCart, setCartSaga)
-    yield takeLatest(toggleCheckoutItemAction, updatePreCheckoutData)
+    yield takeLatest(toggleCheckoutItemAction, fetchSelectCartItem)
     yield takeLatest([cartActions.setPreCheckoutData, updateItemQuantitySuccessAction], fetchPreCheckout)
 }
