@@ -73,9 +73,10 @@ export function* setCartSaga(action) {
 export function* fetchSelectCartItem(action) {
 
     try {
-        let { cart: { preCheckoutData: { listItems } } } = yield select()
+        let { cart: { preCheckoutData } } = yield select()
         // const { preCheckoutData } = cart
         // const { listItems } = preCheckoutData
+        let { listItems } = preCheckoutData
         listItems = [...listItems]
 
         const {
@@ -90,6 +91,7 @@ export function* fetchSelectCartItem(action) {
         }
 
         yield put(cartActions.setPreCheckoutData({
+            ...preCheckoutData,
             listItems
         }))
 
@@ -102,12 +104,12 @@ export function* fetchPreCheckout(action) {
 
     try {
         let { cart: { preCheckoutData } } = yield select()
-        if(action.type === updateItemQuantitySuccessAction.toString()) {
+        if (action.type === updateItemQuantitySuccessAction.toString()) {
             let productId = action.payload
-            if(!preCheckoutData.listItems.find(e => e === productId)) return
+            if (!preCheckoutData.listItems.find(e => e === productId)) return
         }
         yield put(cartActions.togglePreCheckoutLoading(true))
-        
+
         const res = yield call(cartService.preCheckout, preCheckoutData)
         yield put(cartActions.setPreCheckoutResponse(res.data))
 
@@ -116,4 +118,23 @@ export function* fetchPreCheckout(action) {
     } catch (err) {
         handleError(err)
     }
+}
+
+export function* fetchAddPromotion(action) {
+    try {
+        yield put(cartActions.togglePromotionLoading(true))
+        yield call(cartService.getPromotion, action.payload.data)
+        yield put(cartActions.togglePromotionCode(action.payload.data))
+        action.payload?.onSuccess?.()
+    } catch (err) {
+        // handleError(err)
+        action.payload?.onError?.(err)
+    } finally {
+        yield put(cartActions.togglePromotionLoading(false))
+    }
+}
+
+export function* removePromotion(action) {
+    yield put(cartActions.togglePromotionCode())
+    action?.payload?.onSuccess?.()
 }
