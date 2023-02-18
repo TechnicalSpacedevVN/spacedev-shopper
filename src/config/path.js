@@ -6,6 +6,7 @@ export const PATH = {
     ProductDetail: '/:slug',
     Category: '/:slug/:id',
     ViewCart: '/gio-hang',
+    Checkout: '/checkout',
     Profile: {
         index: PROFILE,
         Order: PROFILE + '/don-hang',

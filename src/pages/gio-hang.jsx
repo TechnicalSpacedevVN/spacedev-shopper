@@ -139,7 +139,7 @@ export const ViewCart = () => {
                                             </Spin>
                                         </div>
                                         {/* Button */}
-                                        <Link className={cn("btn  btn-block btn-dark mb-2", { disabled: !preCheckoutResponse?.listItems?.length })} to="checkout.html">Proceed to Checkout</Link>
+                                        <Link className={cn("btn  btn-block btn-dark mb-2", { disabled: !preCheckoutResponse?.listItems?.length })} to={PATH.Checkout}>Proceed to Checkout</Link>
                                         {/* Link */}
                                         <a className="btn btn-link btn-sm px-0 text-body" href="shop.html">
                                             <i className="fe fe-arrow-left mr-2" /> Continue Shopping
