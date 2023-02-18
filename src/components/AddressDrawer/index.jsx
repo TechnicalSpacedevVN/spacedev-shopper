@@ -4,11 +4,10 @@ import { Drawer } from 'antd'
 import React from 'react'
 import { ListAddressCard } from '../AddressCard'
 
-export const AddressDrawer = ({ open, onClose }) => {
+export const AddressDrawer = ({ onSelect, selected = {}, open, onClose }) => {
     const { data, loading } = useQuery({
         queryFn: () => userService.getAddress()
     })
-
     return (
         <Drawer width={470} open={open} onClose={onClose} headerStyle={{ display: 'none' }} bodyStyle={{ padding: 0 }}>
             <div className="modal-content">
@@ -21,13 +20,23 @@ export const AddressDrawer = ({ open, onClose }) => {
                     <strong className="mx-auto">Select your address</strong>
                 </div>
                 {/* List group */}
-                <ul className="list-group list-group-lg list-group-flush">
-                    <ListAddressCard 
+                <div className="list-group list-group-lg list-group-flush row">
+                    <ListAddressCard
                         loading={loading}
                         loadingCount={3}
                         data={data?.data}
+                        hideAction
+                        className={(e) => ({
+                            "border-b !mb-0 ": true,
+                            "cursor-pointer !bg-white hover:!bg-[#eefff3]": selected?._id !== e._id,
+                            "!bg-[#eefff3]": selected?._id === e._id
+                        })}
+                        onClick={(e) => {
+                            onSelect(e)
+                            onClose()
+                        }}
                     />
-                </ul>
+                </div>
                 {/* Buttons */}
                 <div className="modal-body mt-auto">
                     <a className="btn btn-block btn-outline-dark" href="./shopping-cart.html">Thêm mới</a>

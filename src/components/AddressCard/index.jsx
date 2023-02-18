@@ -33,7 +33,7 @@ const AddressCardLoading = () => {
     )
 }
 
-export const AddressCard = withLoading(({ action, className, hideAction, onDeleteAddress, onChangeAddressDefault, _id, fullName, email, phone, province, district, address, default: addressDefault }) => {
+export const AddressCard = withLoading(({ action, className, hideAction, onDeleteAddress, onChangeAddressDefault, _id, fullName, email, phone, province, district, address, default: addressDefault, ...props }) => {
     // const flagRemoveAddressRef = useRef(false)
 
     const _onDeleteAddress = useAction({
@@ -95,13 +95,13 @@ export const AddressCard = withLoading(({ action, className, hideAction, onDelet
 
 
     return (
-        <AddressCardStyle className="col-12">
+        <AddressCardStyle className="col-12" onClick={props.onClick}>
             {/* Card */}
             <div className={cn("card card-lg bg-light mb-8", className)}>
                 <div className="card-body">
                     {/* Text */}
                     <p className="font-size-sm mb-0 leading-[35px]">
-                        <a className="text-body text-xl font-bold " href="./product.html">{fullName}</a> <br />
+                        <b className="text-body text-xl font-bold ">{fullName}</b> <br />
                         <b>Số điện thoại:</b> {phone} <br />
                         <b>Email:</b>{email}<br />
                         <b>Quận / Huyện:</b> {district} <br />
@@ -142,9 +142,7 @@ export const AddressCard = withLoading(({ action, className, hideAction, onDelet
                             </div>
                         )
                     }
-
                     {action}
-
                 </div>
             </div>
         </AddressCardStyle>
