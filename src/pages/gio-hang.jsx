@@ -2,17 +2,18 @@ import { CartItem } from '@/components/CartItem'
 import { PATH } from '@/config'
 import { useAuth } from '@/hooks/useAuth'
 import { useCart } from '@/hooks/useCart'
-import { currency } from '@/utils'
+import { cn, currency } from '@/utils'
+import { Spin } from 'antd'
 import React from 'react'
 import { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 export const ViewCart = () => {
-    const { cart, preCheckoutResponse } = useCart()
+    const { cart, preCheckoutResponse, preCheckoutLoading } = useCart()
     const { user } = useAuth()
     const navigate = useNavigate()
     useEffect(() => {
-        if(!user) {
+        if (!user) {
             navigate(PATH.Account)
         }
     }, [])
@@ -67,28 +68,30 @@ export const ViewCart = () => {
                                     <div className="col-12 col-md-5 col-lg-4 offset-lg-1">
                                         {/* Total */}
                                         <div className="product-card card mb-7 bg-light">
-                                            <div className="card-body">
-                                                <ul className="list-group list-group-sm list-group-flush-y list-group-flush-x">
-                                                    <li className="list-group-item d-flex">
-                                                        <span>Subtotal</span> <span className="ml-auto font-size-sm">{currency(preCheckoutResponse?.subTotal)}</span>
-                                                    </li>
-                                                    <li className="list-group-item d-flex">
-                                                        <span>Promotion</span> <span className="ml-auto font-size-sm">-{currency(preCheckoutResponse?.promotion)}</span>
-                                                    </li>
-                                                    <li className="list-group-item d-flex">
-                                                        <span>Tax</span> <span className="ml-auto font-size-sm">{currency(preCheckoutResponse?.tax)}</span>
-                                                    </li>
-                                                    <li className="list-group-item d-flex font-size-lg font-weight-bold">
-                                                        <span>Total</span> <span className="ml-auto font-size-sm">{currency(preCheckoutResponse?.total)}</span>
-                                                    </li>
-                                                    <li className="list-group-item font-size-sm text-center text-gray-500">
-                                                        Giá vận chuyển sẽ được tính khi checkout *
-                                                    </li>
-                                                </ul>
-                                            </div>
+                                            <Spin spinning={preCheckoutLoading}>
+                                                <div className="card-body">
+                                                    <ul className="list-group list-group-sm list-group-flush-y list-group-flush-x">
+                                                        <li className="list-group-item d-flex">
+                                                            <span>Subtotal</span> <span className="ml-auto font-size-sm">{currency(preCheckoutResponse?.subTotal)}</span>
+                                                        </li>
+                                                        <li className="list-group-item d-flex">
+                                                            <span>Promotion</span> <span className="ml-auto font-size-sm">-{currency(preCheckoutResponse?.promotion)}</span>
+                                                        </li>
+                                                        <li className="list-group-item d-flex">
+                                                            <span>Tax</span> <span className="ml-auto font-size-sm">{currency(preCheckoutResponse?.tax)}</span>
+                                                        </li>
+                                                        <li className="list-group-item d-flex font-size-lg font-weight-bold">
+                                                            <span>Total</span> <span className="ml-auto font-size-sm">{currency(preCheckoutResponse?.total)}</span>
+                                                        </li>
+                                                        <li className="list-group-item font-size-sm text-center text-gray-500">
+                                                            Giá vận chuyển sẽ được tính khi checkout *
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </Spin>
                                         </div>
                                         {/* Button */}
-                                        <a className="btn btn-block btn-dark mb-2" href="checkout.html">Proceed to Checkout</a>
+                                        <Link className={cn("btn  btn-block btn-dark mb-2", { disabled: !preCheckoutResponse?.listItems?.length })} to="checkout.html">Proceed to Checkout</Link>
                                         {/* Link */}
                                         <a className="btn btn-link btn-sm px-0 text-body" href="shop.html">
                                             <i className="fe fe-arrow-left mr-2" /> Continue Shopping

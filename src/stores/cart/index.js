@@ -17,6 +17,7 @@ export const { reducer: cartReducer, actions: cartActions, name, getInitialState
                 listItems: []
             },
             preCheckoutResponse: null,
+            preCheckoutLoading: false,
             loading: {
                 // 234234: true
             }
@@ -31,6 +32,9 @@ export const { reducer: cartReducer, actions: cartActions, name, getInitialState
         },
         toggleProductLoading(state, action) {
             state.loading[action.payload.productId] = action.payload.loading
+        },
+        togglePreCheckoutLoading(state, action) {
+            state.preCheckoutLoading = action.payload
         },
         setPreCheckoutData(state, action) {
             state.preCheckoutData = action.payload

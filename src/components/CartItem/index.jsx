@@ -23,39 +23,51 @@ export const CartItem = ({ allowSelect, productId, product, quantity }) => {
         }
     }, [quantity])
 
-    const onDecrement = () => {
-        // inputRef.current.value--
-        setQuantity(_quantity - 1)
-
-        dispatch(updateCartItemAction({
-            productId,
-            quantity: _quantity - 1,
-        }))
-
+    const onChangeQuantityCurry = (val) => () => {
+        if (val === 0) {
+            dispatch(removeCartItemAction(productId))
+        } else {
+            setQuantity(val)
+            dispatch(updateCartItemAction({
+                productId,
+                quantity: val,
+            }))
+        }
     }
 
-    const onIncrement = () => {
-        // inputRef.current.value++
-        setQuantity(_quantity + 1)
+    // const onDecrement = () => {
+    //     // inputRef.current.value--
+    //     setQuantity(_quantity - 1)
+
+    //     dispatch(updateCartItemAction({
+    //         productId,
+    //         quantity: _quantity - 1,
+    //     }))
+
+    // }
+
+    // const onIncrement = () => {
+    //     // inputRef.current.value++
+    //     setQuantity(_quantity + 1)
 
 
-        dispatch(updateCartItemAction({
-            productId,
-            quantity: _quantity + 1
-        }))
-    }
+    //     dispatch(updateCartItemAction({
+    //         productId,
+    //         quantity: _quantity + 1
+    //     }))
+    // }
 
-    const onUpdateQuantity = (val) => {
-        dispatch(updateCartItemAction({
-            productId,
-            quantity: val
-        }))
-    }
+    // const onUpdateQuantity = (val) => {
+    //     dispatch(updateCartItemAction({
+    //         productId,
+    //         quantity: val
+    //     }))
+    // }
 
-    const onRemoveCartItem = () => {
-        dispatch(removeCartItemAction(productId))
+    // const onRemoveCartItem = () => {
+    //     dispatch(removeCartItemAction(productId))
 
-    }
+    // }
 
     const onSelectCartItemn = (checked) => {
         dispatch(toggleCheckoutItemAction({
@@ -69,7 +81,7 @@ export const CartItem = ({ allowSelect, productId, product, quantity }) => {
             <li className="list-group-item">
                 <div className="row align-items-center">
                     {
-                        allowSelect && <Checkbox onChange={onSelectCartItemn}/>
+                        allowSelect && <Checkbox onChange={onSelectCartItemn} />
                     }
                     <div className="w-[120px]">
                         {/* Image */}
@@ -101,12 +113,12 @@ export const CartItem = ({ allowSelect, productId, product, quantity }) => {
                                     onOpenChange={visible => setOpenPopconfirmQuantity(visible)}
                                     onConfirm={() => {
                                         setOpenPopconfirmQuantity(false)
-                                        onRemoveCartItem()
+                                        onChangeQuantityCurry(0)()
                                     }}
                                     disabled={_quantity > 1}
                                     okText="Xóa"
                                     showCancel={false} placement="bottomRight" title="Thông báo" description="Bạn có chắc chắn muốn xóa sản phẩm này">
-                                    <button onClick={_quantity > 1 ? onDecrement : undefined} className="btn">-</button>
+                                    <button onClick={_quantity > 1 ? onChangeQuantityCurry(_quantity - 1) : undefined} className="btn">-</button>
                                 </Popconfirm>
                                 <input
                                     value={_quantity}
@@ -123,7 +135,7 @@ export const CartItem = ({ allowSelect, productId, product, quantity }) => {
                                         }
                                     }}
                                 />
-                                <button onClick={onIncrement} className="btn">+</button>
+                                <button onClick={onChangeQuantityCurry(_quantity + 1)} className="btn">+</button>
                             </div>
                             {/* Remove */}
                             <Popconfirm
@@ -134,7 +146,8 @@ export const CartItem = ({ allowSelect, productId, product, quantity }) => {
                                 description="Bạn có chắc chắn muốn xóa sản phẩm này"
                                 onConfirm={() => {
                                     setOpenpopconfirm(false)
-                                    onRemoveCartItem()
+                                    // onRemoveCartItem()
+                                    onChangeQuantityCurry(0)
                                 }}>
                                 <a onClick={ev => ev.preventDefault()} className="font-size-xs text-gray-400 ml-auto" href="#!">
                                     <i className="fe fe-x" /> Xóa

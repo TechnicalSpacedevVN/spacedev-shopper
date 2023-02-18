@@ -106,10 +106,12 @@ export function* fetchPreCheckout(action) {
             let productId = action.payload
             if(!preCheckoutData.listItems.find(e => e === productId)) return
         }
-
+        yield put(cartActions.togglePreCheckoutLoading(true))
         
         const res = yield call(cartService.preCheckout, preCheckoutData)
         yield put(cartActions.setPreCheckoutResponse(res.data))
+
+        yield put(cartActions.togglePreCheckoutLoading(false))
 
     } catch (err) {
         handleError(err)
