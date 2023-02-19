@@ -2,6 +2,7 @@ import { PATH } from "@/config";
 import { ProfileLayout } from "@/layouts/ProfileLayout";
 import { Profile } from "@/pages/ca-nhan";
 import { Order } from "@/pages/ca-nhan/don-hang";
+import { OrderDetail } from "@/pages/ca-nhan/don-hang/[id]";
 import { WishlistPage } from "@/pages/ca-nhan/san-pham-yeu-thich";
 import { AddressPage } from "@/pages/ca-nhan/so-dia-chi";
 import { ActionAddressPage } from "@/pages/ca-nhan/so-dia-chi/action";
@@ -50,6 +51,10 @@ export const profile = [
             {
                 element: <Order />,
                 path: PATH.Profile.Order
+            },
+            {
+                element: <OrderDetail />,
+                path: PATH.Profile.OrderDetail
             }
         ]
     }

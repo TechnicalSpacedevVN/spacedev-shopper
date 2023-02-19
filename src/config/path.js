@@ -11,6 +11,7 @@ export const PATH = {
     Profile: {
         index: PROFILE,
         Order: PROFILE + '/don-hang',
+        OrderDetail: PROFILE + '/don-hang/:id',
         Wishlist: PROFILE + '/san-pham-yeu-thich',
         Address: PROFILE + '/so-dia-chi',
         NewAddress: PROFILE + '/so-dia-chi/new',

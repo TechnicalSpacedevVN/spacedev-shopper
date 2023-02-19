@@ -3,3 +3,4 @@ export const AUTHEN_API = import.meta.env.VITE_AUTHEN_API
 export const USER_API = import.meta.env.VITE_USER_API
 export const FILE_API = import.meta.env.VITE_FILE_API
 export const CART_API = import.meta.env.VITE_CART_API
+export const ORDER_API = import.meta.env.VITE_ORDER_API
