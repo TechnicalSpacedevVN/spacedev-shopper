@@ -151,7 +151,7 @@ export const CartItem = ({ footer, hideAction, allowSelect, productId, product, 
                                         onConfirm={() => {
                                             setOpenpopconfirm(false)
                                             // onRemoveCartItem()
-                                            onChangeQuantityCurry(0)
+                                            onChangeQuantityCurry(0)()
                                         }}>
                                         <a onClick={ev => ev.preventDefault()} className="font-size-xs text-gray-400 ml-auto" href="#!">
                                             <i className="fe fe-x" /> Xóa
