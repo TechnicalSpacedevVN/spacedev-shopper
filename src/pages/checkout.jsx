@@ -11,7 +11,7 @@ import { useQuery } from '@/hooks/useQuery'
 import { cartService } from '@/services/cart'
 import { userService } from '@/services/user'
 import { cartActions } from '@/stores/cart'
-import { currency, regexp, required } from '@/utils'
+import { currency, regexp, required, storeAddressSelect } from '@/utils'
 import { Spin } from 'antd'
 import React from 'react'
 import { useState } from 'react'
@@ -36,10 +36,11 @@ export const Checkout = () => {
     const noteRef = useRef('')
 
     const [openAddressDrawer, setOpenAddressDrawer] = useState(false)
-    const [address, setAddress] = useState()
+    const [address, setAddress] = useState(() => storeAddressSelect.get())
     const dispatch = useDispatch()
-
+    
     const { loading: addressLoading } = useQuery({
+        enabled: !address,
         queryFn: () => userService.getAddress('?default=true'),
         onSuccess: (res) => {
             if (res?.data?.[0]) {
@@ -108,7 +109,10 @@ export const Checkout = () => {
 
     return (
         <>
-            <AddressDrawer onSelect={setAddress} selected={address} open={openAddressDrawer} onClose={() => setOpenAddressDrawer(false)} />
+            <AddressDrawer onSelect={(address) => {
+                setAddress(address)
+                storeAddressSelect.set(address)
+            }} selected={address} open={openAddressDrawer} onClose={() => setOpenAddressDrawer(false)} />
             <div>
                 <section className="pt-7 pb-12">
                     <div className="container">

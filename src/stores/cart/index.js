@@ -1,8 +1,8 @@
+import { storeCart, storePreCheckoutData, storePreCheckoutResponse } from "@/utils";
 import { createAction, createSlice } from "@reduxjs/toolkit";
 import { takeLatest } from 'redux-saga/effects';
 import { loginSuccessAction, logoutAction } from "../auth";
 import { clearCart, fetchAddPromotion, fetchCart, fetchCartItem, fetchPreCheckout, fetchRemoveItem, fetchSelectCartItem, removePromotion, setCartSaga } from "./saga";
-import { getCart } from "@/utils";
 
 
 
@@ -11,14 +11,14 @@ export const { reducer: cartReducer, actions: cartActions, name, getInitialState
     name: 'cart',
     initialState: () => {
         return {
-            cart: getCart(),
+            cart: storeCart.get(),
             openCartOver: false,
-            preCheckoutData: {
+            preCheckoutData: storePreCheckoutData.get() || {
                 promotionCode: [],
                 listItems: [],
                 shippingMethod: 'mien-phi'
             },
-            preCheckoutResponse: {},
+            preCheckoutResponse: storePreCheckoutResponse.get() || {},
             preCheckoutLoading: false,
             promotionLoading: false,
             loading: {
@@ -92,7 +92,7 @@ export function* cartSaga() {
     yield takeLatest(updateCartItemAction, fetchCartItem)
     yield takeLatest(removeCartItemAction, fetchRemoveItem)
     yield takeLatest([getCartAction, loginSuccessAction, cartActions.clearCart], fetchCart)
-    yield takeLatest(logoutAction, clearCart)
+    yield takeLatest([logoutAction, cartActions.clearCart], clearCart)
     yield takeLatest(cartActions.setCart, setCartSaga)
     yield takeLatest(toggleCheckoutItemAction, fetchSelectCartItem)
     yield takeLatest([cartActions.setPreCheckoutData, updateItemQuantitySuccessAction, cartActions.togglePromotionCode, cartActions.changeShippingMethod], fetchPreCheckout)

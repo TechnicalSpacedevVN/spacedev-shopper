@@ -4,6 +4,8 @@ import { Drawer } from 'antd'
 import React from 'react'
 import { AddressCard, ListAddressCard } from '../AddressCard'
 import { cn } from '@/utils'
+import { Link } from 'react-router-dom'
+import { PATH } from '@/config'
 
 export const AddressDrawer = ({ onSelect, selected, open, onClose }) => {
     const { data, loading } = useQuery({
@@ -46,7 +48,7 @@ export const AddressDrawer = ({ onSelect, selected, open, onClose }) => {
                 </div>
                 {/* Buttons */}
                 <div className="modal-body mt-auto">
-                    <a className="btn btn-block btn-outline-dark" href="./shopping-cart.html">Thêm mới</a>
+                    <Link className="btn btn-block btn-outline-dark" to={PATH.Profile.NewAddress}>Thêm mới</Link>
                 </div>
             </div>
 

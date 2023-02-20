@@ -1,8 +1,8 @@
 import { cartService } from "@/services/cart";
-import { getToken, handleError, setCart } from "@/utils";
+import { getToken, handleError, storeAddressSelect, storeCart, storePreCheckoutData, storePreCheckoutResponse } from "@/utils";
 import { call, delay, put, race, select, take } from 'redux-saga/effects';
+import { cartActions, getCartAction, removeCartItemAction, updateItemQuantitySuccessAction } from ".";
 import { authActions } from "../auth";
-import { cartActions, getCartAction, updateCartItemAction, removeCartItemAction, updateItemQuantitySuccessAction } from ".";
 
 export function* fetchCartItem(action) {
     try {
@@ -62,13 +62,18 @@ export function* fetchCart() {
 }
 
 export function* clearCart() {
+    storePreCheckoutData.clear()
+    storePreCheckoutResponse.clear()
+    storeAddressSelect.clear()
+    storeCart.clear()
+
     yield put(cartActions.setCart(null))
-    yield put(cartActions.clearCart())
+    // yield put(cartActions.clearCart())
     // getInitialState()
 }
 
 export function* setCartSaga(action) {
-    setCart(action.payload)
+    storeCart.set(action.payload)
 }
 
 export function* fetchSelectCartItem(action) {
@@ -115,7 +120,8 @@ export function* fetchPreCheckout(action) {
         yield put(cartActions.setPreCheckoutResponse(res.data))
 
         yield put(cartActions.togglePreCheckoutLoading(false))
-
+        storePreCheckoutData.set(preCheckoutData)
+        storePreCheckoutResponse.set(res.data)
     } catch (err) {
         handleError(err)
     }
