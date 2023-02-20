@@ -19,7 +19,7 @@ export const ProfileLayout = () => {
                         {/* Nav */}
                         <nav className="mb-10 mb-md-0">
                             <div className="list-group list-group-sm list-group-strong list-group-flush-x">
-                                <NavLink className="list-group-item list-group-item-action dropright-toggle " to="account-orders.html">Theo dõi đơn hàng</NavLink>
+                                <NavLink className="list-group-item list-group-item-action dropright-toggle " to={PATH.Profile.Order}>Theo dõi đơn hàng</NavLink>
                                 <NavLink className="list-group-item list-group-item-action dropright-toggle " end to={PATH.Profile.index}>Thông tin cá nhân</NavLink>
                                 <NavLink className="list-group-item list-group-item-action dropright-toggle " to={PATH.Profile.Wishlist}>Sản phẩm yêu thích</NavLink>
                                 <NavLink className="list-group-item list-group-item-action dropright-toggle " to={PATH.Profile.Address}>Sổ địa chỉ</NavLink>

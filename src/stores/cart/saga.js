@@ -38,7 +38,7 @@ export function* fetchRemoveItem(action) {
         yield call(cartService.removeItem, action.payload)
         yield put(getCartAction())
         yield put(cartActions.toggleProductLoading({ productId: action.payload, loading: false }))
-        yield put(updateItemQuantitySuccessAction(action.payload))
+        // yield put(updateItemQuantitySuccessAction(action.payload))
     } catch (err) {
         console.error(err)
     }
@@ -144,4 +144,14 @@ export function* fetchAddPromotion(action) {
 export function* removePromotion(action) {
     yield put(cartActions.togglePromotionCode())
     action?.payload?.onSuccess?.()
+}
+
+export function* updatePreCheckoutData(action) {
+    let { cart: { preCheckoutData } } = yield select()
+    if(preCheckoutData.listItems.find(e => e === action.payload)) {
+        yield put(cartActions.setPreCheckoutData({
+            ...preCheckoutData,
+            listItems: preCheckoutData.listItems.filter(e => e !== action.payload)
+        }))
+    }
 }

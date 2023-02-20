@@ -2,7 +2,7 @@ import { storeCart, storePreCheckoutData, storePreCheckoutResponse } from "@/uti
 import { createAction, createSlice } from "@reduxjs/toolkit";
 import { takeLatest } from 'redux-saga/effects';
 import { loginSuccessAction, logoutAction } from "../auth";
-import { clearCart, fetchAddPromotion, fetchCart, fetchCartItem, fetchPreCheckout, fetchRemoveItem, fetchSelectCartItem, removePromotion, setCartSaga } from "./saga";
+import { clearCart, fetchAddPromotion, fetchCart, fetchCartItem, fetchPreCheckout, fetchRemoveItem, fetchSelectCartItem, removePromotion, setCartSaga, updatePreCheckoutData } from "./saga";
 
 
 
@@ -101,4 +101,6 @@ export function* cartSaga() {
     yield takeLatest(addPromotionAction, fetchAddPromotion)
     yield takeLatest(removePromotionAction, removePromotion)
 
+
+    yield takeLatest(removeCartItemAction, updatePreCheckoutData)
 }

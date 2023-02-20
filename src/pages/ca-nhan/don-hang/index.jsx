@@ -1,28 +1,12 @@
-import { OrderCard } from '@/components/OrderCard'
+import { ListOrder } from '@/components/OrderCard'
 import { Tab } from '@/components/Tab'
 import { useQuery } from '@/hooks/useQuery'
+import { useSearch } from '@/hooks/useSearch'
 import { orderService } from '@/services/order'
 import { Badge } from 'antd'
 export const Order = () => {
-    const { data: allData } = useQuery({
-        queryFn: () => orderService.getOrder()
-    })
-    const { data: pendingData } = useQuery({
-        queryFn: () => orderService.getOrder('?status=pending')
-    })
-    const { data: confirmData } = useQuery({
-        queryFn: () => orderService.getOrder('?status=confirm')
-    })
-    const { data: finishedData } = useQuery({
-        queryFn: () => orderService.getOrder('?status=finished')
-    })
-    const { data: cancelData } = useQuery({
-        queryFn: () => orderService.getOrder('?status=cancel')
-    })
-    const { data: shippingData } = useQuery({
-        queryFn: () => orderService.getOrder('?status=shipping')
-    })
 
+    const [, setSearch] = useSearch()
 
     const { data: pendingCount } = useQuery({
         queryFn: () => orderService.getCount('?status=pending')
@@ -36,7 +20,7 @@ export const Order = () => {
 
 
     return (
-        <Tab defaultActive="all">
+        <Tab defaultActive="all" removeOnDeActive onChange={() => setSearch({ page: 1 })}>
             <div className="nav mb-10">
                 <Tab.Title value="all">Tất cả đơn</Tab.Title>
                 <Badge count={pendingCount?.count}>
@@ -53,73 +37,32 @@ export const Order = () => {
             </div>
             <div className="tab-content">
                 <Tab.Content value="all">
-                    {
+                    <ListOrder />
+                    {/* {
                         allData && allData.data.map(e => <OrderCard key={e._id} {...e} />)
-                    }
+                    } */}
                 </Tab.Content>
                 <Tab.Content value="pending">
-                    {
-                        pendingData && pendingData.data.map(e => <OrderCard key={e._id} {...e} />)
-                    }
+                    <ListOrder status="pending" />
                 </Tab.Content>
                 <Tab.Content value="confirm">
-                    {
-                        confirmData && confirmData.data.map(e => <OrderCard key={e._id} {...e} />)
-                    }
+                    <ListOrder status="confirm" />
                 </Tab.Content>
                 <Tab.Content value="shipping">
-                    {
-                        shippingData && shippingData.data.map(e => <OrderCard key={e._id} {...e} />)
-                    }
+                    <ListOrder status="shipping" />
                 </Tab.Content>
                 <Tab.Content value="finished">
+                    <ListOrder status="finished" />
                     {/* <div className="flex items-center flex-col gap-5 text-center">
                         <img width={200} src="/img/empty-order.png" alt />
                         <p>Chưa có đơn hàng nào</p>
                     </div> */}
-                    {
-                        finishedData && finishedData.data.map(e => <OrderCard key={e._id} {...e} />)
-                    }
                 </Tab.Content>
                 <Tab.Content value="cancel">
-                    {
-                        cancelData && cancelData.data.map(e => <OrderCard key={e._id} {...e} />)
-                    }
+                    <ListOrder status="cancel" />
+
                 </Tab.Content>
             </div>
-            {/* Pagination */}
-            <nav className="d-flex justify-content-center justify-content-md-end mt-10">
-                <ul className="pagination pagination-sm text-gray-400">
-                    <li className="page-item">
-                        <a className="page-link page-link-arrow" href="#">
-                            <i className="fa fa-caret-left" />
-                        </a>
-                    </li>
-                    <li className="page-item active">
-                        <a className="page-link" href="#">1</a>
-                    </li>
-                    <li className="page-item">
-                        <a className="page-link" href="#">2</a>
-                    </li>
-                    <li className="page-item">
-                        <a className="page-link" href="#">3</a>
-                    </li>
-                    <li className="page-item">
-                        <a className="page-link" href="#">4</a>
-                    </li>
-                    <li className="page-item">
-                        <a className="page-link" href="#">5</a>
-                    </li>
-                    <li className="page-item">
-                        <a className="page-link" href="#">6</a>
-                    </li>
-                    <li className="page-item">
-                        <a className="page-link page-link-arrow" href="#">
-                            <i className="fa fa-caret-right" />
-                        </a>
-                    </li>
-                </ul>
-            </nav>
         </Tab>
 
 

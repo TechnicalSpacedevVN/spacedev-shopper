@@ -1,30 +1,57 @@
 import { cn } from "@/utils"
-import { createContext, useContext, useState } from "react"
+import { createContext, useContext, useEffect, useRef, useState } from "react"
+import { Link, useLocation, useSearchParams } from "react-router-dom"
 
 const Context = createContext({})
 
-export const Tab = ({ children, defaultActive }) => {
-    const [active, setActive] = useState(defaultActive)
+export const Tab = ({ name = 'tab', removeOnDeActive, children, defaultActive, onChange }) => {
+    const [search] = useSearchParams()
+    const [active, _setActive] = useState(search.get(name) || defaultActive)
+
+    const setActive = (value) => {
+        _setActive(value)
+        onChange?.(value)
+    }
 
     return (
-        <Context.Provider value={{ active, setActive }}>{children}</Context.Provider>
+        <Context.Provider value={{ removeOnDeActive, active, setActive, name }}>{children}</Context.Provider>
     )
 }
 
 
 Tab.Title = ({ children, value }) => {
-    const { active, setActive } = useContext(Context)
+    const { pathname } = useLocation()
+    const [search, setSearch] = useSearchParams()
+    const { active, setActive, name } = useContext(Context)
 
     const onClick = (ev) => {
         ev.preventDefault()
         setActive(value)
+        setSearch((search) => {
+            const _search = new URLSearchParams(search)
+            _search.set(name, value)
+            return _search
+        })
     }
 
     return <a onClick={onClick} className={cn("nav-link", { active: value === active })} href="#">{children}</a>
 }
 
 Tab.Content = ({ children, value }) => {
-    const { active } = useContext(Context)
+    const firstRender = useRef(false)
+    const { active, removeOnDeActive } = useContext(Context)
+
+    useEffect(() => {
+        if(active === value) {
+            firstRender.current = true
+        }
+    }, [active])
+
+    if (removeOnDeActive && active !== value) {
+        if(!firstRender.current) {
+            return null
+        }
+    }
 
     return <div className={cn("tab-pane fade", { 'show active': active === value })}>{children}</div>
 }

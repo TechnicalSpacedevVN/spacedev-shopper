@@ -150,12 +150,12 @@ export const Footer = () => {
                         </div>
                         <div className="col-auto">
                             {/* Payment methods */}
-                            <img className="footer-payment" src="./img/payment/mastercard.svg" alt="..." />
-                            <img className="footer-payment" src="./img/payment/visa.svg" alt="..." />
-                            <img className="footer-payment" src="./img/payment/amex.svg" alt="..." />
-                            <img className="footer-payment" src="./img/payment/paypal.svg" alt="..." />
-                            <img className="footer-payment" src="./img/payment/maestro.svg" alt="..." />
-                            <img className="footer-payment" src="./img/payment/klarna.svg" alt="..." />
+                            <img className="footer-payment" src="/img/payment/mastercard.svg" alt="..." />
+                            <img className="footer-payment" src="/img/payment/visa.svg" alt="..." />
+                            <img className="footer-payment" src="/img/payment/amex.svg" alt="..." />
+                            <img className="footer-payment" src="/img/payment/paypal.svg" alt="..." />
+                            <img className="footer-payment" src="/img/payment/maestro.svg" alt="..." />
+                            <img className="footer-payment" src="/img/payment/klarna.svg" alt="..." />
                         </div>
                     </div>
                 </div>

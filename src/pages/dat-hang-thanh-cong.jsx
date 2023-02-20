@@ -1,15 +1,15 @@
 import { PATH } from '@/config'
 import React from 'react'
 import { useEffect } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Link, generatePath, useLocation, useNavigate, useParams } from 'react-router-dom'
 
 export const OrderComplete = () => {
-    const {state} = useLocation()  
+    const { state } = useLocation()
     const navigate = useNavigate()
     useEffect(() => {
-        if(!state?._id) navigate(PATH.Product)
+        if (!state?._id) navigate(PATH.Product)
     }, [state])
-    
+
     return (
         <section className="py-12">
             <div className="container">
@@ -26,9 +26,9 @@ export const OrderComplete = () => {
                             are shown for your personal accont.
                         </p>
                         {/* Button */}
-                        <a className="btn btn-dark" href="./account-order.html">
+                        <Link className="btn btn-dark" to={generatePath(PATH.Profile.OrderDetail, { id: state?._id })}>
                             View My Orders
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </div>
