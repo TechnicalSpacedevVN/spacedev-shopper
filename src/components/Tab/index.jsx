@@ -4,7 +4,7 @@ import { Link, useLocation, useSearchParams } from "react-router-dom"
 
 const Context = createContext({})
 
-export const Tab = ({ name = 'tab', removeOnDeActive, children, defaultActive, onChange }) => {
+export const Tab = ({ name = 'tab', removeOnDeActive, children, defaultActive, onChange, onSearchChange }) => {
     const [search] = useSearchParams()
     const [active, _setActive] = useState(search.get(name) || defaultActive)
 
@@ -14,7 +14,7 @@ export const Tab = ({ name = 'tab', removeOnDeActive, children, defaultActive, o
     }
 
     return (
-        <Context.Provider value={{ removeOnDeActive, active, setActive, name }}>{children}</Context.Provider>
+        <Context.Provider value={{ removeOnDeActive, active: search.get(name) || defaultActive, setActive, name, onSearchChange }}>{children}</Context.Provider>
     )
 }
 
@@ -22,7 +22,7 @@ export const Tab = ({ name = 'tab', removeOnDeActive, children, defaultActive, o
 Tab.Title = ({ children, value }) => {
     const { pathname } = useLocation()
     const [search, setSearch] = useSearchParams()
-    const { active, setActive, name } = useContext(Context)
+    const { active, setActive, name, onSearchChange } = useContext(Context)
 
     const onClick = (ev) => {
         ev.preventDefault()
@@ -30,8 +30,9 @@ Tab.Title = ({ children, value }) => {
         setSearch((search) => {
             const _search = new URLSearchParams(search)
             _search.set(name, value)
+            onSearchChange(_search)
             return _search
-        })
+        }, { replace: true })
     }
 
     return <a onClick={onClick} className={cn("nav-link", { active: value === active })} href="#">{children}</a>
@@ -42,13 +43,13 @@ Tab.Content = ({ children, value }) => {
     const { active, removeOnDeActive } = useContext(Context)
 
     useEffect(() => {
-        if(active === value) {
+        if (active === value) {
             firstRender.current = true
         }
     }, [active])
 
     if (removeOnDeActive && active !== value) {
-        if(!firstRender.current) {
+        if (!firstRender.current) {
             return null
         }
     }

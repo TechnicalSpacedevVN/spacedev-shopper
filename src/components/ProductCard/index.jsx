@@ -1,4 +1,4 @@
-import { currency, handleError } from "@/utils"
+import { cn, currency, handleError } from "@/utils"
 import { Skeleton } from "../Skeleton"
 import { useCategory } from "@/hooks/useCategories"
 import { productService } from "@/services/product"
@@ -16,7 +16,7 @@ import { useDispatch } from "react-redux"
 import { updateCartItemAction } from "@/stores/cart"
 import { useCart } from "@/hooks/useCart"
 
-export const ProductCard = ({ onRemoveWishlistSuccess, showRemove, slug, showWishlist, id, images, categories, rating_average, review_count, name, price, real_price, discount_rate }) => {
+export const ProductCard = ({ className, onRemoveWishlistSuccess, showRemove, slug, showWishlist, id, images, categories, rating_average, review_count, name, price, real_price, discount_rate }) => {
     const img1 = images?.[0]?.thumbnail_url
     const img2 = images?.[1] ? images?.[1]?.thumbnail_url : img1
     const category = useCategory(categories)
@@ -58,7 +58,7 @@ export const ProductCard = ({ onRemoveWishlistSuccess, showRemove, slug, showWis
     }
 
     return (
-        <div className="col-6 col-md-4">
+        <div className={cn("col-6 col-md-4", className)}>
             {/* Card */}
             <div className="product-card card mb-7">
                 {/* Badge */}
@@ -156,10 +156,10 @@ export const ProductCard = ({ onRemoveWishlistSuccess, showRemove, slug, showWis
 }
 
 
-export const ProductCardLoading = () => {
+export const ProductCardLoading = ({className}) => {
 
     return (
-        <div className="col-6 col-md-4">
+        <div className={cn("col-6 col-md-4", className)}>
             {/* Card */}
             <div className="product-card card mb-7">
 

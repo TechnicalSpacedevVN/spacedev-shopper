@@ -20,7 +20,7 @@ export const Order = () => {
 
 
     return (
-        <Tab defaultActive="all" removeOnDeActive onChange={() => setSearch({ page: 1 })}>
+        <Tab defaultActive="all" removeOnDeActive onSearchChange={search => search.delete('page')}>
             <div className="nav mb-10">
                 <Tab.Title value="all">Tất cả đơn</Tab.Title>
                 <Badge count={pendingCount?.count}>

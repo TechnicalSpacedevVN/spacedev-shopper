@@ -11,9 +11,9 @@ export const useSearch = (defaultValue) => {
             value[key] = val || defaultValue[key]
         }
     }
-    const setValue = (valueObj) => {
+    const setValue = (valueObj, options) => {
         const qs = queryString.stringify({ ...value, ...valueObj })
-        setSearch(qs)
+        setSearch(qs, options)
     }
 
     return [value, setValue]

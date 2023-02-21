@@ -2,6 +2,7 @@ import { Button } from '@/components/Button'
 import { Field } from '@/components/Field'
 import { ResetPasswordModal } from '@/components/ResetPasswordModal'
 import { useTranslate } from '@/components/TranslateProvider'
+import { AUTH_MESSAGE } from '@/config/message'
 import { useAuth } from '@/hooks/useAuth'
 import { useBodyClass } from '@/hooks/useBodyClass'
 import { useForm } from '@/hooks/useForm'
@@ -13,6 +14,7 @@ import { loginAction, loginByCodeAction } from '@/stores/auth'
 import { regexp, required, confirm, handleError, copyToClipboard } from '@/utils'
 import { message } from 'antd'
 import { useEffect, useState } from 'react'
+import { Helmet } from 'react-helmet'
 import { useDispatch } from 'react-redux'
 
 export const Account = () => {
@@ -92,7 +94,7 @@ export const Account = () => {
                 dispatch(loginAction({
                     data: formLogin.values,
                     onError: handleError,
-                    onSuccess: () => message.success(t('Login success'))
+                    onSuccess: () => message.success(t(AUTH_MESSAGE.LOGIN_SUCCESS))
                 }))
                 // message.success(t('Login success'))
             } catch (err) {
@@ -108,6 +110,9 @@ export const Account = () => {
 
     return (
         <>
+            <Helmet>
+                <title>Tài khoản</title>
+            </Helmet>
             <ResetPasswordModal open={openResetPassword} onClose={() => setOpenResetPassword(false)} />
             <section className="py-12">
 

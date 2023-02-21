@@ -14,7 +14,7 @@ import { Button } from '../Button'
 import { cartActions } from '@/stores/cart'
 import { useTranslate } from '../TranslateProvider'
 
-const LANG  = {
+const LANG = {
     en: 'English',
     vi: 'Tiếng Việt',
     china: 'China'
@@ -111,7 +111,7 @@ export const Header = () => {
                                     <a className="nav-link" href="./faq.html">Câu hỏi</a>
                                 </li>
                                 <li className="nav-item">
-                                    <a className="nav-link" href="./contact-us.html">Liên hệ</a>
+                                    <Link className="nav-link" to={PATH.Contact}>Liên hệ</Link>
                                 </li>
                             </ul>
                             {/* Nav */}
@@ -144,10 +144,10 @@ export const Header = () => {
                 <nav className="navbar navbar-expand-lg navbar-light bg-white">
                     <div className="container">
                         {/* Brand */}
-                        <a className="navbar-brand" href="./index.html">
+                        <Link className="navbar-brand" to={PATH.Home}>
                             <img style={{ width: 50 }} src="/img/logo.svg" />
                             Shopper.
-                        </a>
+                        </Link>
                         {/* Toggler */}
                         <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                             <span className="navbar-toggler-icon" />
@@ -162,14 +162,15 @@ export const Header = () => {
                                 <li className="nav-item">
                                     <Link className="nav-link" to={PATH.Product}>{t('Product')}</Link>
                                 </li>
+
                                 <li className="nav-item dropdown">
-                                    <a className="nav-link" href="./shop.html">{t('Laptop')}</a>
+                                    <Link className="nav-link" to="/dien-thoai-may-tinh-bang/1789">{t('Phone')}</Link>
                                 </li>
                                 <li className="nav-item dropdown">
-                                    <a className="nav-link" href="./shop.html">Máy tính</a>
+                                    <Link className="nav-link" to="/laptop-thiet-bi-it/1846">{t('Laptop')}</Link>
                                 </li>
                                 <li className="nav-item">
-                                    <a className="nav-link" href="./shop.html">Sản phẩm khuyến mãi</a>
+                                    <Link className="nav-link" to="/san-pham?page=1&sort=discount_rate.desc">{t('Sản phẩm khuyến mãi')}</Link>
                                 </li>
                             </ul>
                             {/* Nav */}

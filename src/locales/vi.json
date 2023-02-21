@@ -2,6 +2,7 @@
     "Home": "Trang chủ",
     "Product": "Sản phẩm",
     "Laptop": "Máy tính sách tay",
-    "Login success": "Đăng nhập thành công",
+    "Login success": "Đăng nhập tập khoản thành công",
+    "Logout success": "Đăng xuất tài khoản thành công",
     "Username or Password incorrect!": "Tài khoản hoặc mật khẩu không đúng"
 }

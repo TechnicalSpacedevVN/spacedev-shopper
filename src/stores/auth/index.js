@@ -19,6 +19,9 @@ export const { reducer: authReducer, actions: authActions, name } = createSlice(
         },
         setUser: (state, action) => {
             state.user = action.payload
+        },
+        toggleLoading: (state, action) => {
+            state.loginLoading = action.payload
         }
     },
 })

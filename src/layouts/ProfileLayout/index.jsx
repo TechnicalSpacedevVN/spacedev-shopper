@@ -1,5 +1,6 @@
 import { PATH } from "@/config"
 import { logoutAction } from "@/stores/auth"
+import { Helmet } from "react-helmet"
 import { useDispatch } from "react-redux"
 import { Link, NavLink, Outlet } from "react-router-dom"
 
@@ -7,6 +8,9 @@ export const ProfileLayout = () => {
     const dispatch = useDispatch()
     return (
         <section className="pt-7 pb-12">
+            <Helmet>
+                <title>Tải khoản</title>
+            </Helmet>
             <div className="container">
                 <div className="row">
                     <div className="col-12 text-center">

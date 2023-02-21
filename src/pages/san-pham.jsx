@@ -14,6 +14,7 @@ import { useDidUpdateEffect } from '@/hooks/useDidUpdateEffect'
 import { Radio } from '@/components/Radio'
 import { Breadcrumb } from '@/components/Breadcrumb'
 import { Slider } from '@/components/Slider'
+import { Helmet } from 'react-helmet'
 
 export const ProductPage = () => {
 
@@ -56,6 +57,9 @@ export const ProductPage = () => {
     const category = useCategory(parseInt(id))
     return (
         <section className="py-11">
+            <Helmet>
+                <title>Sản phẩm</title>
+            </Helmet>
             <div className="container">
                 <div className="row">
                     <div className="col-12 col-md-4 col-lg-3">
@@ -178,7 +182,7 @@ export const ProductPage = () => {
                     <div className="col-12 col-md-8 col-lg-9">
                         <Slider>
                             <div className="w-100">
-                                <div className="card bg-h-100 bg-left" style={{ backgroundImage: 'url(./img/covers/cover-24.jpg)' }}>
+                                <div className="card bg-h-100 bg-left" style={{ backgroundImage: 'url(/img/covers/cover-24.jpg)' }}>
                                     <div className="row" style={{ minHeight: 400 }}>
                                         <div className="col-12 col-md-10 col-lg-8 col-xl-6 align-self-center">
                                             <div className="card-body px-md-10 py-11">
@@ -190,12 +194,12 @@ export const ProductPage = () => {
                                                 </a>
                                             </div>
                                         </div>
-                                        <div className="col-12 col-md-2 col-lg-4 col-xl-6 d-none d-md-block bg-cover" style={{ backgroundImage: 'url(./img/covers/cover-16.jpg)' }} />
+                                        <div className="col-12 col-md-2 col-lg-4 col-xl-6 d-none d-md-block bg-cover" style={{ backgroundImage: 'url(/img/covers/cover-16.jpg)' }} />
                                     </div>
                                 </div>
                             </div>
                             <div className="w-100">
-                                <div className="card bg-cover" style={{ backgroundImage: 'url(./img/covers/cover-29.jpg)' }}>
+                                <div className="card bg-cover" style={{ backgroundImage: 'url(/img/covers/cover-29.jpg)' }}>
                                     <div className="row align-items-center" style={{ minHeight: 400 }}>
                                         <div className="col-12 col-md-10 col-lg-8 col-xl-6">
                                             <div className="card-body px-md-10 py-11">
@@ -213,7 +217,7 @@ export const ProductPage = () => {
                                 </div>
                             </div>
                             <div className="w-100">
-                                <div className="card bg-cover" style={{ backgroundImage: 'url(./img/covers/cover-30.jpg)' }}>
+                                <div className="card bg-cover" style={{ backgroundImage: 'url(/img/covers/cover-30.jpg)' }}>
                                     <div className="row align-items-center" style={{ minHeight: 400 }}>
                                         <div className="col-12">
                                             <div className="card-body px-md-10 py-11 text-center text-white">

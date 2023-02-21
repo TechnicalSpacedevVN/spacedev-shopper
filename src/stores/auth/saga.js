@@ -5,6 +5,9 @@ import { handleError } from "@/utils"
 import { clearToken, clearUser, getToken, setToken, setUser } from "@/utils/token"
 import { call, put } from "redux-saga/effects"
 import { authActions, loginSuccessAction } from "."
+import { message } from "antd"
+import { t } from "@/components/TranslateProvider"
+import { AUTH_MESSAGE } from "@/config/message"
 
 
 
@@ -65,6 +68,7 @@ import { authActions, loginSuccessAction } from "."
 
 export function* fetchLogin(action) {
     try {
+        yield put(authActions.toggleLoading(true))
         const res = yield call(authService.login, action.payload.data)
         setToken(res.data)
         const user = yield call(userService.getUser)
@@ -80,6 +84,8 @@ export function* fetchLogin(action) {
         action.payload?.onError(err)
 
         // throw err.response.data
+    } finally {
+        yield put(authActions.toggleLoading(false))
     }
 }
 
@@ -90,6 +96,7 @@ export function* logout() {
     // thunkApi.dispatch(cartActions.setCart(null))
     clearUser()
     clearToken()
+    message.success(t(AUTH_MESSAGE.LOGOUT_SUCCESS))
 }
 
 export function* fetchUser() {
