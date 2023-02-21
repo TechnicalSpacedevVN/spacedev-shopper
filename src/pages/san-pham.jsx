@@ -13,6 +13,7 @@ import { useSearch } from '@/hooks/useSearch'
 import { useDidUpdateEffect } from '@/hooks/useDidUpdateEffect'
 import { Radio } from '@/components/Radio'
 import { Breadcrumb } from '@/components/Breadcrumb'
+import { Slider } from '@/components/Slider'
 
 export const ProductPage = () => {
 
@@ -175,7 +176,7 @@ export const ProductPage = () => {
                         </div>
                     </div>
                     <div className="col-12 col-md-8 col-lg-9">
-                        {/* <div className="flickity-page-dots-inner mb-9" data-flickity="{&quot;pageDots&quot;: true}">
+                        <Slider>
                             <div className="w-100">
                                 <div className="card bg-h-100 bg-left" style={{ backgroundImage: 'url(./img/covers/cover-24.jpg)' }}>
                                     <div className="row" style={{ minHeight: 400 }}>
@@ -224,7 +225,7 @@ export const ProductPage = () => {
                                     </div>
                                 </div>
                             </div>
-                        </div> */}
+                        </Slider>
                         {/* Header */}
                         <div className="row align-items-center mb-7">
                             <div className="col-12 col-md">
