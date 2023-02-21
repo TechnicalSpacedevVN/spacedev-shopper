@@ -67,7 +67,6 @@ export const ProductDetailPage = () => {
 
     if (loading) return null
 
-    const { listItems } = cart
 
     const onActiveImageModalCurry = (i) => () => {
         setCurrentImage(i)
@@ -76,6 +75,7 @@ export const ProductDetailPage = () => {
 
     const onAddCartItem = () => {
         if (user) {
+            const { listItems } = cart
             const cartItem = listItems.find(e => e.productId === product.id)
             dispatch(updateCartItemAction({
                 productId: product.id,

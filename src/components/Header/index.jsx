@@ -12,6 +12,13 @@ import { CartDrawer } from '../CartDrawer'
 import { CheckCircleFilled } from '@ant-design/icons'
 import { Button } from '../Button'
 import { cartActions } from '@/stores/cart'
+import { useTranslate } from '../TranslateProvider'
+
+const LANG  = {
+    en: 'English',
+    vi: 'Tiếng Việt',
+    china: 'China'
+}
 
 export const Header = () => {
     const { user } = useAuth()
@@ -19,6 +26,7 @@ export const Header = () => {
     const [openCartDrawer, setOpenCartDrawer] = useState(false)
     const dispatch = useDispatch()
     const { cart, openCartOver } = useCart()
+    const { t, setLang, lang } = useTranslate()
     return (
         <>
             <SearchDrawer open={openSearchDrawer} onClose={() => setOpenSerachDrawer(false)} />
@@ -68,13 +76,30 @@ export const Header = () => {
                                 </li>
                                 <li className="nav-item dropdown">
                                     {/* Toggle */}
-                                    <a className="nav-link dropdown-toggle" data-toggle="dropdown" href="#">English</a>
-                                    {/* Menu */}
-                                    <div className="dropdown-menu minw-0">
-                                        <a className="dropdown-item" href="#">English</a>
-                                        <a className="dropdown-item" href="#">Tiếng Việt</a>
-                                        <a className="dropdown-item" href="#">China</a>
-                                    </div>
+                                    <Dropdown menu={{
+                                        items: [
+                                            {
+                                                key: 1,
+                                                label: 'English',
+                                                onClick: () => setLang('en')
+                                            },
+                                            {
+                                                key: 2,
+                                                onClick: () => setLang('vi'),
+                                                label: 'Tiếng Việt',
+                                            },
+                                            {
+                                                key: 3,
+                                                onClick: () => setLang('china'),
+                                                label: 'China',
+                                            },
+
+                                        ]
+                                    }}>
+                                        <a className="nav-link dropdown-toggle" data-toggle="dropdown" href="#">{LANG[lang]}</a>
+                                    </Dropdown>
+
+
                                 </li>
                             </ul>
                             {/* Nav */}
@@ -132,13 +157,13 @@ export const Header = () => {
                             {/* Nav */}
                             <ul className="navbar-nav mx-auto">
                                 <li className="nav-item">
-                                    <Link className="nav-link" to={PATH.Home}>Trang chủ</Link>
+                                    <Link className="nav-link" to={PATH.Home}>{t('Home')}</Link>
                                 </li>
                                 <li className="nav-item">
-                                    <Link className="nav-link" to={PATH.Product}>Sản phẩm</Link>
+                                    <Link className="nav-link" to={PATH.Product}>{t('Product')}</Link>
                                 </li>
                                 <li className="nav-item dropdown">
-                                    <a className="nav-link" href="./shop.html">Laptop</a>
+                                    <a className="nav-link" href="./shop.html">{t('Laptop')}</a>
                                 </li>
                                 <li className="nav-item dropdown">
                                     <a className="nav-link" href="./shop.html">Máy tính</a>
@@ -164,7 +189,7 @@ export const Header = () => {
                                 </li>
                                 <li className="nav-item ml-lg-n4">
                                     <Popover onOpenChange={visible => {
-                                        if(!visible) {
+                                        if (!visible) {
                                             dispatch(cartActions.togglePopover(false))
                                         }
                                     }} trigger={['click']} open={openCartOver} placement="bottomRight" content={<>

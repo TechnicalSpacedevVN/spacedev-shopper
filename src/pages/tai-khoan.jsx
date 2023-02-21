@@ -1,5 +1,7 @@
 import { Button } from '@/components/Button'
 import { Field } from '@/components/Field'
+import { ResetPasswordModal } from '@/components/ResetPasswordModal'
+import { useTranslate } from '@/components/TranslateProvider'
 import { useAuth } from '@/hooks/useAuth'
 import { useBodyClass } from '@/hooks/useBodyClass'
 import { useForm } from '@/hooks/useForm'
@@ -10,11 +12,12 @@ import { userService } from '@/services/user'
 import { loginAction, loginByCodeAction } from '@/stores/auth'
 import { regexp, required, confirm, handleError, copyToClipboard } from '@/utils'
 import { message } from 'antd'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 export const Account = () => {
     useBodyClass('bg-light')
+    const [openResetPassword, setOpenResetPassword] = useState(false)
     const [search] = useSearch()
     const dispatch = useDispatch()
     const { loginLoading } = useAuth()
@@ -32,6 +35,7 @@ export const Account = () => {
             dispatch(loginByCodeAction(search.code))
         }
     }, [])
+    const { t } = useTranslate()
 
     // const { loading: loginLoading, refetch: loginService } = useQuery({
     //     enabled: false,
@@ -85,8 +89,12 @@ export const Account = () => {
     const onLogin = async () => {
         if (formLogin.validate()) {
             try {
-                dispatch(loginAction(formLogin.values))
-                message.success('Login success')
+                dispatch(loginAction({
+                    data: formLogin.values,
+                    onError: handleError,
+                    onSuccess: () => message.success(t('Login success'))
+                }))
+                // message.success(t('Login success'))
             } catch (err) {
                 handleError(err)
             }
@@ -99,124 +107,131 @@ export const Account = () => {
     }
 
     return (
-        <section className="py-12">
-            <div className="container">
-                <div className="row">
-                    <div className="col-12 col-md-6">
-                        {/* Card */}
-                        <div className="card card-lg mb-10 mb-md-0">
-                            <div className="card-body">
-                                {/* Heading */}
-                                <h6 className="mb-7">Returning Customer</h6>
-                                {/* Form */}
-                                <div>
-                                    <div className="row">
-                                        <div className="col-12">
-                                            {/* Email */}
-                                            <Field
-                                                placeholder="Email Address *"
-                                                {...formLogin.register('username')}
-                                            />
-                                        </div>
-                                        <div className="col-12">
-                                            {/* Password */}
-                                            <Field
-                                                placeholder="Password *"
-                                                type="password"
-                                                {...formLogin.register('password')}
-                                            />
-                                        </div>
-                                        <div className="col-12 col-md">
-                                            {/* Remember */}
-                                            <div className="form-group">
-                                                <div className="custom-control custom-checkbox">
-                                                    <input className="custom-control-input" id="loginRemember" type="checkbox" />
-                                                    <label className="custom-control-label" htmlFor="loginRemember">
-                                                        Remember me
-                                                    </label>
+        <>
+            <ResetPasswordModal open={openResetPassword} onClose={() => setOpenResetPassword(false)} />
+            <section className="py-12">
+
+                <div className="container">
+                    <div className="row">
+                        <div className="col-12 col-md-6">
+                            {/* Card */}
+                            <div className="card card-lg mb-10 mb-md-0">
+                                <div className="card-body">
+                                    {/* Heading */}
+                                    <h6 className="mb-7">Returning Customer</h6>
+                                    {/* Form */}
+                                    <div>
+                                        <div className="row">
+                                            <div className="col-12">
+                                                {/* Email */}
+                                                <Field
+                                                    placeholder="Email Address *"
+                                                    {...formLogin.register('username')}
+                                                />
+                                            </div>
+                                            <div className="col-12">
+                                                {/* Password */}
+                                                <Field
+                                                    placeholder="Password *"
+                                                    type="password"
+                                                    {...formLogin.register('password')}
+                                                />
+                                            </div>
+                                            <div className="col-12 col-md">
+                                                {/* Remember */}
+                                                <div className="form-group">
+                                                    <div className="custom-control custom-checkbox">
+                                                        <input className="custom-control-input" id="loginRemember" type="checkbox" />
+                                                        <label className="custom-control-label" htmlFor="loginRemember">
+                                                            Remember me
+                                                        </label>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div className="col-12 col-md-auto">
-                                            {/* Link */}
-                                            <div className="form-group">
-                                                <a className="font-size-sm text-reset" data-toggle="modal" href="#modalPasswordReset">Forgot
-                                                    Password?</a>
+                                            <div className="col-12 col-md-auto">
+                                                {/* Link */}
+                                                <div className="form-group">
+                                                    <a onClick={(ev) => {
+                                                        ev.preventDefault()
+                                                        setOpenResetPassword(true)
+                                                    }} className="font-size-sm text-reset" href="#">Forgot
+                                                        Password?</a>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="col-12">
-                                            {/* Button */}
-                                            <Button onClick={onLogin} loading={loginLoading}>
-                                                Sign In
-                                            </Button>
-                                        </div>
-                                        <div className="col-12">
-                                            <p className="font-size-sm text-muted mt-5 mb-2 font-light">Tài khoản demo: <b className="text-black"><span className="cursor-pointer underline" onClick={_copyToClipboard}>demo@spacedev.com</span> / <span className="cursor-pointer underline" onClick={_copyToClipboard}>Spacedev@123</span></b></p>
-                                            <p className="font-size-sm text-muted mt-5 mb-2 font-light text-justify">
-                                                Chúng tôi cung cấp cho bạn tài khoản demo vì mục đích học tập, để đảm bảo những người khác có thể sử dụng chung tài khoản chúng tôi sẽ
-                                                hạn chế rất nhiều quyền trên tài khoản này ví dụ:  <br />
-                                                - Không thay đổi thông tin cá nhân, mật khẩu <br />
-                                                - không reset password,... <br /><br />
-                                                Để có thể sử dụng toàn bộ chức năng trên website, vui lòng tiến hành <b className="text-black">đăng ký</b> bằng tài khoản email có thật
-                                            </p>
+                                            <div className="col-12">
+                                                {/* Button */}
+                                                <Button onClick={onLogin} loading={loginLoading}>
+                                                    Sign In
+                                                </Button>
+                                            </div>
+                                            <div className="col-12">
+                                                <p className="font-size-sm text-muted mt-5 mb-2 font-light">Tài khoản demo: <b className="text-black"><span className="cursor-pointer underline" onClick={_copyToClipboard}>demo@spacedev.com</span> / <span className="cursor-pointer underline" onClick={_copyToClipboard}>Spacedev@123</span></b></p>
+                                                <p className="font-size-sm text-muted mt-5 mb-2 font-light text-justify">
+                                                    Chúng tôi cung cấp cho bạn tài khoản demo vì mục đích học tập, để đảm bảo những người khác có thể sử dụng chung tài khoản chúng tôi sẽ
+                                                    hạn chế rất nhiều quyền trên tài khoản này ví dụ:  <br />
+                                                    - Không thay đổi thông tin cá nhân, mật khẩu <br />
+                                                    - không reset password,... <br /><br />
+                                                    Để có thể sử dụng toàn bộ chức năng trên website, vui lòng tiến hành <b className="text-black">đăng ký</b> bằng tài khoản email có thật
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div className="col-12 col-md-6">
-                        {/* Card */}
-                        <div className="card card-lg">
-                            <div className="card-body">
-                                {/* Heading */}
-                                <h6 className="mb-7">New Customer</h6>
-                                {/* Form */}
-                                <div>
-                                    <div className="row">
-                                        <div className="col-12">
-                                            <Field
-                                                placeholder="Full Name *"
-                                                {...formRegister.register('name')}
-                                            />
-                                        </div>
-                                        <div className="col-12">
-                                            {/* Email */}
-                                            <Field
-                                                placeholder="Email Address *"
-                                                {...formRegister.register('username')}
-
-                                            />
-
-                                        </div>
-                                        <div className="col-12 col-md-6">
-                                            {/* Password */}
-                                            <Field
-                                                placeholder="Password *"
-                                                type="password"
-                                                {...formRegister.register('password')}
-
-                                            />
-
-                                        </div>
-                                        <div className="col-12 col-md-6">
-                                            {/* Password */}
-                                            <Field
-                                                placeholder="Confirm Password *"
-                                                type="password"
-                                                {...formRegister.register('confirmPassword')}
-                                            />
-                                        </div>
-                                        <div className="col-12 col-md-auto">
-                                            {/* Link */}
-                                            <div className="form-group font-size-sm text-muted font-light">
-                                                By registering your details, you agree with our Terms &amp; Conditions,
-                                                and Privacy and Cookie Policy.
+                        <div className="col-12 col-md-6">
+                            {/* Card */}
+                            <div className="card card-lg">
+                                <div className="card-body">
+                                    {/* Heading */}
+                                    <h6 className="mb-7">New Customer</h6>
+                                    {/* Form */}
+                                    <div>
+                                        <div className="row">
+                                            <div className="col-12">
+                                                <Field
+                                                    placeholder="Full Name *"
+                                                    {...formRegister.register('name')}
+                                                />
                                             </div>
-                                        </div>
-                                        <div className="col-12">
-                                            {/* Button */}
-                                            <Button loading={loading} onClick={onRegister}>Register</Button>
+                                            <div className="col-12">
+                                                {/* Email */}
+                                                <Field
+                                                    placeholder="Email Address *"
+                                                    {...formRegister.register('username')}
+
+                                                />
+
+                                            </div>
+                                            <div className="col-12 col-md-6">
+                                                {/* Password */}
+                                                <Field
+                                                    placeholder="Password *"
+                                                    type="password"
+                                                    {...formRegister.register('password')}
+
+                                                />
+
+                                            </div>
+                                            <div className="col-12 col-md-6">
+                                                {/* Password */}
+                                                <Field
+                                                    placeholder="Confirm Password *"
+                                                    type="password"
+                                                    {...formRegister.register('confirmPassword')}
+                                                />
+                                            </div>
+                                            <div className="col-12 col-md-auto">
+                                                {/* Link */}
+                                                <div className="form-group font-size-sm text-muted font-light">
+                                                    By registering your details, you agree with our Terms &amp; Conditions,
+                                                    and Privacy and Cookie Policy.
+                                                </div>
+                                            </div>
+                                            <div className="col-12">
+                                                {/* Button */}
+                                                <Button loading={loading} onClick={onRegister}>Register</Button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -224,8 +239,8 @@ export const Account = () => {
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </>
 
     )
 }

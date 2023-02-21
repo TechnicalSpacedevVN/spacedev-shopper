@@ -8,6 +8,7 @@ export const PATH = {
     ViewCart: '/gio-hang',
     Checkout: '/checkout',
     OrderComplete: '/dat-hang-thanh-cong',
+    ResetPassword: '/reset-password',
     Profile: {
         index: PROFILE,
         Order: PROFILE + '/don-hang',

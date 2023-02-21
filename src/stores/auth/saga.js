@@ -65,7 +65,7 @@ import { authActions, loginSuccessAction } from "."
 
 export function* fetchLogin(action) {
     try {
-        const res = yield call(authService.login, action.payload)
+        const res = yield call(authService.login, action.payload.data)
         setToken(res.data)
         const user = yield call(userService.getUser)
         setUser(user.data)
@@ -73,12 +73,12 @@ export function* fetchLogin(action) {
         // yield put(getCartAction())
         yield put(authActions.setUser(user.data))
         yield put(loginSuccessAction())
-
+        action.payload?.onSuccess(user.data)
         // thunkApi.dispatch(getCartAction())
         // return user.data
     } catch (err) {
-        console.log(err)
-        handleError(err)
+        action.payload?.onError(err)
+
         // throw err.response.data
     }
 }
