@@ -176,7 +176,9 @@ export const OrderDetail = () => {
                                             {checkReturn && <Button className="btn-xs" outline>Đổi trả</Button>}
                                             {['finished', 'cancel'].includes(status) && <Button className="btn-xs" outline>Mua lại</Button>}
                                             {/* <a href="#" className="btn btn-sm btn-block btn-outline-dark">Đỏi trả</a> */}
-                                            {/* <a href="#" className="btn btn-sm btn-block btn-outline-dark">Viết review</a> */}
+                                            {
+                                                status === 'finished' && !e.review && <Link to={`/${e.product.slug}`} state={{ orderId: detail.data._id }} className="btn btn-xs btn-block btn-outline-dark">Viết review</Link>
+                                            }
                                         </div>
                                     </div>
                                 </div>
