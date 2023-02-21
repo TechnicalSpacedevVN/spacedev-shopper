@@ -30,7 +30,7 @@ Tab.Title = ({ children, value }) => {
         setSearch((search) => {
             const _search = new URLSearchParams(search)
             _search.set(name, value)
-            onSearchChange(_search)
+            onSearchChange?.(_search)
             return _search
         }, { replace: true })
     }
