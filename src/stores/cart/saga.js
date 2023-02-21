@@ -6,6 +6,10 @@ import { authActions } from "../auth";
 
 export function* fetchCartItem(action) {
     try {
+        yield put(cartActions.toggleProductLoading({
+            productId: action.payload.productId,
+            loading: true
+        }))
         yield delay(300)
         if (action.payload.quantity >= 1) {
             yield call(cartService.addItem, action.payload.productId, action.payload.quantity)
@@ -28,6 +32,11 @@ export function* fetchCartItem(action) {
 
     } catch (err) {
         console.error(err)
+    } finally {
+        yield put(cartActions.toggleProductLoading({
+            productId: action.payload.productId,
+            loading: false
+        }))
     }
 }
 
@@ -148,7 +157,7 @@ export function* removePromotion(action) {
 
 export function* updatePreCheckoutData(action) {
     let { cart: { preCheckoutData } } = yield select()
-    if(preCheckoutData.listItems.find(e => e === action.payload)) {
+    if (preCheckoutData.listItems.find(e => e === action.payload)) {
         yield put(cartActions.setPreCheckoutData({
             ...preCheckoutData,
             listItems: preCheckoutData.listItems.filter(e => e !== action.payload)

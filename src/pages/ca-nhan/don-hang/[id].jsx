@@ -8,7 +8,7 @@ import { currency } from '@/utils'
 import { message } from 'antd'
 import moment from 'moment'
 import React from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, generatePath, useNavigate, useParams } from 'react-router-dom'
 
 const SHIPPING = {
     'giao-hang-nhanh': 'Giao hàng nhanh',
@@ -167,7 +167,7 @@ export const OrderDetail = () => {
                                     </div>
                                     <div className="col">
                                         {/* Title */}
-                                        <p className="mb-4 font-size-sm font-weight-bold">
+                                        <p className="mb-4 font-size-sm font-weight-bold pr-[140px]">
                                             <a className="text-body" href="product.html">{e.product.name} x {e.quantity}</a> <br />
                                             <span className="text-muted">{currency(e.product.real_price)}</span>
                                         </p>
@@ -176,7 +176,9 @@ export const OrderDetail = () => {
                                             {checkReturn && <Button className="btn-xs" outline>Đổi trả</Button>}
                                             {['finished', 'cancel'].includes(status) && <Button className="btn-xs" outline>Mua lại</Button>}
                                             {/* <a href="#" className="btn btn-sm btn-block btn-outline-dark">Đỏi trả</a> */}
-                                            {/* <a href="#" className="btn btn-sm btn-block btn-outline-dark">Viết review</a> */}
+                                            {
+                                                !e?.review && <Link to={`/${e.product.slug}`} state={{ orderId: detail.data._id }} className="btn btn-sm btn-block btn-outline-dark">Viết review</Link>
+                                            }
                                         </div>
                                     </div>
                                 </div>

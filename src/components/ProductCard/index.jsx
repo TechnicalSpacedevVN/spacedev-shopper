@@ -4,7 +4,7 @@ import { useCategory } from "@/hooks/useCategories"
 import { productService } from "@/services/product"
 import { message } from "antd"
 import { delay } from "@/utils/delay"
-import { useNavigate } from "react-router-dom"
+import { Link, generatePath, useNavigate } from "react-router-dom"
 import { PATH } from "@/config"
 import { useAuth } from "@/hooks/useAuth"
 import { Popconfirm } from "../Popconfirm"
@@ -16,7 +16,7 @@ import { useDispatch } from "react-redux"
 import { updateCartItemAction } from "@/stores/cart"
 import { useCart } from "@/hooks/useCart"
 
-export const ProductCard = ({ onRemoveWishlistSuccess, showRemove, showWishlist, id, images, categories, rating_average, review_count, name, price, real_price, slug, discount_rate }) => {
+export const ProductCard = ({ onRemoveWishlistSuccess, showRemove, slug, showWishlist, id, images, categories, rating_average, review_count, name, price, real_price, discount_rate }) => {
     const img1 = images?.[0]?.thumbnail_url
     const img2 = images?.[1] ? images?.[1]?.thumbnail_url : img1
     const category = useCategory(categories)
@@ -31,33 +31,6 @@ export const ProductCard = ({ onRemoveWishlistSuccess, showRemove, showWishlist,
         successMessage: `Thêm sản phẩm "${name}" vào yêu thích thành công`
     })
 
-    // const flagWishlistRef = useRef(false)
-
-
-    // const onAddWishlist = async () => {
-    //     if(flagWishlistRef.current) return
-
-    //     flagWishlistRef.current = true
-    //     const key = `add-wishlist-${id}`
-
-    //     try {
-
-    //         message.loading({
-    //             key,
-    //             content: `Đang thêm sản phẩm "${name}" vào yêu thích`,
-    //             duration: 0
-    //         })
-    //         await productService.addWishlist(id)
-    //         message.success({
-    //             key,
-    //             content: `Thêm sản phẩm "${name}" vào yêu thích thành công`
-    //         })
-    //     } catch (err) {
-    //         handleError(err, key)
-    //     }
-
-    //     flagWishlistRef.current = false
-    // }
 
     const onRemoveWishlist = useAction({
         service: () => productService.removeWishlist(id),
@@ -66,28 +39,7 @@ export const ProductCard = ({ onRemoveWishlistSuccess, showRemove, showWishlist,
         onSuccess: onRemoveWishlistSuccess
     })
 
-    // const onRemoveWishlist = async () => {
-
-    //     const key = `remove-wishlist-${id}`
-
-    //     try {
-
-    //         message.loading({
-    //             key,
-    //             content: `Đang xóa sản phẩm "${name}" khỏi yêu thích`,
-    //             duration: 0
-    //         })
-    //         await productService.removeWishlist(id)
-    //         message.success({
-    //             key,
-    //             content: `Xóa sản phẩm "${name}" khỏi yêu thích thành công`
-    //         })
-    //         onRemoveWishlistSuccess?.(id)
-    //     } catch (err) {
-    //         handleError(err, key)
-    //     }
-    // }
-
+   
     const onAddCartItem = () => {
         if (user) {
 
@@ -119,11 +71,11 @@ export const ProductCard = ({ onRemoveWishlistSuccess, showRemove, showWishlist,
                 {/* Image */}
                 <div className="card-img">
                     {/* Image */}
-                    <a className="card-img-hover" href="product.html">
+                    <Link className="card-img-hover" to={`/${slug}`}>
 
                         <img className="card-img-top card-img-back" src={img1} alt="..." />
                         <img className="card-img-top card-img-front" src={img2} alt="..." />
-                    </a>
+                    </Link>
                     {/* Actions */}
                     <div className="card-actions">
                         <span className="card-action">

@@ -1,10 +1,74 @@
-import React from 'react'
-import { useParams } from 'react-router-dom'
+import { Breadcrumb } from '@/components/Breadcrumb'
+import { Button } from '@/components/Button'
+import { Rating } from '@/components/Rating'
+import { ShortedContent } from '@/components/ShortedContent'
+import { Tab } from '@/components/Tab'
+import { PATH } from '@/config'
+import { useAction } from '@/hooks/useAction'
+import { useAuth } from '@/hooks/useAuth'
+import { useCart } from '@/hooks/useCart'
+import { useCategory } from '@/hooks/useCategories'
+import { useQuery } from '@/hooks/useQuery'
+import { productService } from '@/services/product'
+import { updateCartItemAction } from '@/stores/cart'
+import { currency } from '@/utils'
+import { message, Image } from 'antd'
+import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate, useParams } from 'react-router-dom'
 
 export const ProductDetailPage = () => {
-    const {slug} = useParams()
-    const [,id] = slug.split('-id')
-    console.log(id)
+    const { slug } = useParams()
+    const { cart, loading: productLoading } = useCart()
+    const { user } = useAuth()
+    const [, id] = slug.split('-p')
+    const _addCartLoading = productLoading[parseInt(id)]
+
+    const navigate = useNavigate()
+    const [openImageModal, setOpenImageModal] = useState(false)
+    const [currentImage, setCurrentImage] = useState(0)
+    const { data: detail, loading } = useQuery({
+        queryFn: () => productService.getProductDetail(id),
+        enabled: !!id,
+        onError: () => {
+            message.error('Sản phẩm không tồn tại')
+            navigate(PATH.Product)
+        }
+    })
+    const dispatch = useDispatch()
+
+    const category = useCategory(detail?.data?.categories)
+
+    const { data: product } = detail || {}
+
+    const onAddWishlist = useAction({
+        service: () => productService.addWishlist(id),
+        loadingMessage: `Đang thêm sản phẩm "${product?.name}" vào yêu thích`,
+        successMessage: `Thêm sản phẩm "${product?.name}" vào yêu thích thành công`
+    })
+
+    if (loading) return null
+
+    const { listItems } = cart
+
+    const onActiveImageModalCurry = (i) => () => {
+        setCurrentImage(i)
+        setOpenImageModal(true)
+    }
+
+    const onAddCartItem = () => {
+        if (user) {
+            const cartItem = listItems.find(e => e.productId === product.id)
+            dispatch(updateCartItemAction({
+                productId: product.id,
+                quantity: cartItem ? cartItem.quantity + 1 : 1,
+                showPopover: true
+            }))
+        } else {
+            navigate(PATH.Account)
+        }
+    }
+
     return (
         <>
             <div>
@@ -13,17 +77,11 @@ export const ProductDetailPage = () => {
                         <div className="row">
                             <div className="col-12">
                                 {/* Breadcrumb */}
-                                <ol className="breadcrumb mb-0 font-size-xs text-gray-400">
-                                    <li className="breadcrumb-item">
-                                        <a className="text-gray-400" href="index.html">Home</a>
-                                    </li>
-                                    <li className="breadcrumb-item">
-                                        <a className="text-gray-400" href="shop.html">Women's Shoes</a>
-                                    </li>
-                                    <li className="breadcrumb-item active">
-                                        Leather Sneakers
-                                    </li>
-                                </ol>
+                                <Breadcrumb>
+                                    <Breadcrumb.Item to={PATH.Home}>Home</Breadcrumb.Item>
+                                    <Breadcrumb.Item to={PATH.Product}>Sản phẩm</Breadcrumb.Item>
+                                    <Breadcrumb.Item>{detail.data.name}</Breadcrumb.Item>
+                                </Breadcrumb>
                             </div>
                         </div>
                     </div>
@@ -42,38 +100,46 @@ export const ProductDetailPage = () => {
                                                 Sale
                                             </div>
                                             {/* Slider */}
-                                            <div className="mb-4" data-flickity="{&quot;draggable&quot;: false, &quot;fade&quot;: true}" id="productSlider">
-                                                {/* Item */}
-                                                <a href="./img/products/product-7.jpg" data-fancybox>
-                                                    <img src="./img/products/product-7.jpg" alt="..." className="card-img-top" />
-                                                </a>
-                                                {/* Item */}
-                                                <a href="./img/products/product-122.jpg" data-fancybox>
-                                                    <img src="./img/products/product-122.jpg" alt="..." className="card-img-top" />
-                                                </a>
-                                                {/* Item */}
-                                                <a href="./img/products/product-146.jpg" data-fancybox>
-                                                    <img src="./img/products/product-146.jpg" alt="..." className="card-img-top" />
-                                                </a>
+                                            <div className="mb-4">
+                                                <img onClick={onActiveImageModalCurry(0)} src={product.images[0].thumbnail_url} alt="..." className="card-img-top cursor-pointer" />
+                                            </div>
+
+                                            <div style={{ display: 'none' }}>
+                                                <Image.PreviewGroup
+                                                    preview={{
+                                                        current: currentImage,
+                                                        visible: openImageModal,
+                                                        onVisibleChange: vis => setOpenImageModal(vis),
+                                                        countRender: (current, total) =>`${product.name} - ${current} / ${total}`
+                                                    }}>
+                                                    {product.images.map(e => <Image key={e.thumbnail_url} src={e.thumbnail_url} />)}
+                                                </Image.PreviewGroup>
                                             </div>
                                         </div>
                                         {/* Slider */}
-                                        <div className="flickity-nav mx-n2 mb-10 mb-md-0" data-flickity="{&quot;asNavFor&quot;: &quot;#productSlider&quot;, &quot;contain&quot;: true, &quot;wrapAround&quot;: false}">
-                                            {/* Item */}
-                                            <div className="col-12 px-2" style={{ maxWidth: 113 }}>
-                                                {/* Image */}
-                                                <div className="embed-responsive embed-responsive-1by1 bg-cover" style={{ backgroundImage: 'url(./img/products/product-7.jpg)' }} />
-                                            </div>
-                                            {/* Item */}
-                                            <div className="col-12 px-2" style={{ maxWidth: 113 }}>
-                                                {/* Image */}
-                                                <div className="embed-responsive embed-responsive-1by1 bg-cover" style={{ backgroundImage: 'url(./img/products/product-122.jpg)' }} />
-                                            </div>
-                                            {/* Item */}
-                                            <div className="col-12 px-2" style={{ maxWidth: 113 }}>
-                                                {/* Image */}
-                                                <div className="embed-responsive embed-responsive-1by1 bg-cover" style={{ backgroundImage: 'url(./img/products/product-146.jpg)' }} />
-                                            </div>
+                                        <div className="flickity-nav mx-n2 mb-10 mb-md-0 flex">
+                                            {
+                                                product.images.slice(0, 4).map((e, i) => (
+                                                    <div key={e.thumbnail_url} onClick={onActiveImageModalCurry(i)} className="col-12 px-2 cursor-pointer" style={{ maxWidth: 113 }}>
+                                                        <div className="embed-responsive embed-responsive-1by1 bg-cover" style={{ backgroundImage: `url(${e.thumbnail_url})` }} />
+                                                    </div>
+                                                ))
+                                            }
+
+                                            {
+                                                product.images.length === 5 && <div onClick={onActiveImageModalCurry(4)} key={e.thumbnail_url} className="col-12 px-2 cursor-pointer" style={{ maxWidth: 113 }}>
+                                                    <div className="embed-responsive embed-responsive-1by1 bg-cover" style={{ backgroundImage: `url(${product.images[4].thumbnail_url})` }} />
+                                                </div>
+                                            }
+
+                                            {
+                                                product.images.length > 5 && <div onClick={onActiveImageModalCurry(5)} className="col-12 px-2 cursor-pointer" style={{ maxWidth: 113 }}>
+                                                    <div className="embed-responsive embed-responsive-1by1 text-center bg-cover flex items-center justify-center" style={{ background: `#eee` }}>
+                                                        + {product.images.length - 4} <br />ảnh
+                                                    </div>
+                                                </div>
+                                            }
+
                                         </div>
                                     </div>
                                     <div className="col-12 col-md-6 pl-lg-10">
@@ -81,348 +147,188 @@ export const ProductDetailPage = () => {
                                         <div className="row mb-1">
                                             <div className="col">
                                                 {/* Preheading */}
-                                                <a className="text-muted" href="shop.html">Sneakers</a>
+                                                <a className="text-muted" href="shop.html">{category?.title}</a>
                                             </div>
-                                            <div className="col-auto">
+                                            <div className="col-auto flex items-center">
                                                 {/* Rating */}
-                                                <div className="rating font-size-xs text-dark" data-value={4}>
-                                                    <div className="rating-item">
-                                                        <i className="fas fa-star" />
-                                                    </div>
-                                                    <div className="rating-item">
-                                                        <i className="fas fa-star" />
-                                                    </div>
-                                                    <div className="rating-item">
-                                                        <i className="fas fa-star" />
-                                                    </div>
-                                                    <div className="rating-item">
-                                                        <i className="fas fa-star" />
-                                                    </div>
-                                                    <div className="rating-item">
-                                                        <i className="fas fa-star" />
-                                                    </div>
-                                                </div>
+                                                <Rating value={product.rating_average} />
                                                 <a className="font-size-sm text-reset ml-2" href="#reviews">
-                                                    Reviews (6)
+                                                    Reviews ({product.review_count})
                                                 </a>
                                             </div>
                                         </div>
                                         {/* Heading */}
-                                        <h3 className="mb-2">Leather Sneakers</h3>
+                                        <h3 className="mb-2">{product.name}</h3>
                                         {/* Price */}
                                         <div className="mb-7">
-                                            <span className="font-size-lg font-weight-bold text-gray-350 text-decoration-line-through">$115.00</span>
-                                            <span className="ml-1 font-size-h5 font-weight-bolder text-primary">$85.00</span>
+
+                                            {
+                                                product.real_price < product.price ? <>
+                                                    <span className="font-size-lg font-weight-bold text-gray-350 text-decoration-line-through">{currency(product.real_price)}</span>
+                                                    <span className="ml-1 font-size-h5 font-weight-bolder text-primary">{currency(product.price)}</span>
+                                                </> : <span className="ml-1 font-size-h5 font-weight-bolder text-primary">{currency(product.real_price)}</span>
+                                            }
                                             <span className="font-size-sm ml-1">(In Stock)</span>
+
                                         </div>
                                         {/* Form */}
-                                        <form>
-                                            <div className="form-group">
-                                                {/* Label */}
-                                                <p className="mb-5">
-                                                    Color: <strong id="colorCaption">White</strong>
-                                                </p>
-                                                {/* Radio */}
-                                                <div className="mb-8 ml-n1">
-                                                    <div className="custom-control custom-control-inline custom-control-img">
-                                                        <input type="radio" className="custom-control-input" id="imgRadioOne" name="imgRadio" data-toggle="form-caption" data-target="#colorCaption" defaultValue="White" defaultChecked />
-                                                        <label className="custom-control-label" htmlFor="imgRadioOne">
-                                                            <span className="embed-responsive embed-responsive-1by1 bg-cover" style={{ backgroundImage: 'url(./img/products/product-7.jpg)' }} />
-                                                        </label>
-                                                    </div>
-                                                    <div className="custom-control custom-control-inline custom-control-img">
-                                                        <input type="radio" className="custom-control-input" id="imgRadioTwo" name="imgRadio" data-toggle="form-caption" data-target="#colorCaption" defaultValue="Black" />
-                                                        <label className="custom-control-label" htmlFor="imgRadioTwo">
-                                                            <span className="embed-responsive embed-responsive-1by1 bg-cover" style={{ backgroundImage: 'url(./img/products/product-49.jpg)' }} />
-                                                        </label>
-                                                    </div>
-                                                </div>
+                                        <div className="form-row mb-7">
+                                            <p className="col-12">{product.short_description}</p>
+                                            <div className="col-12 col-lg">
+                                                {/* Submit */}
+                                                <Button loading={_addCartLoading} className="w-full" onClick={onAddCartItem}>
+                                                    Add to Cart <i className="fe fe-shopping-cart ml-2" />
+                                                </Button>
                                             </div>
-                                            <div className="form-group">
-                                                {/* Label */}
-                                                <p className="mb-5">
-                                                    Size: <strong><span id="sizeCaption">7.5</span> US</strong>
-                                                </p>
-                                                {/* Radio */}
-                                                <div className="mb-2">
-                                                    <div className="custom-control custom-control-inline custom-control-size mb-2">
-                                                        <input type="radio" className="custom-control-input" name="sizeRadio" id="sizeRadioOne" defaultValue={6} data-toggle="form-caption" data-target="#sizeCaption" />
-                                                        <label className="custom-control-label" htmlFor="sizeRadioOne">6</label>
-                                                    </div>
-                                                    <div className="custom-control custom-control-inline custom-control-size mb-2">
-                                                        <input type="radio" className="custom-control-input" name="sizeRadio" id="sizeRadioTwo" defaultValue="6.5" data-toggle="form-caption" data-target="#sizeCaption" disabled />
-                                                        <label className="custom-control-label" htmlFor="sizeRadioTwo">6.5</label>
-                                                    </div>
-                                                    <div className="custom-control custom-control-inline custom-control-size mb-2">
-                                                        <input type="radio" className="custom-control-input" name="sizeRadio" id="sizeRadioThree" defaultValue={7} data-toggle="form-caption" data-target="#sizeCaption" />
-                                                        <label className="custom-control-label" htmlFor="sizeRadioThree">7</label>
-                                                    </div>
-                                                    <div className="custom-control custom-control-inline custom-control-size mb-2">
-                                                        <input type="radio" className="custom-control-input" name="sizeRadio" id="sizeRadioFour" defaultValue="7.5" data-toggle="form-caption" data-target="#sizeCaption" defaultChecked />
-                                                        <label className="custom-control-label" htmlFor="sizeRadioFour">7.5</label>
-                                                    </div>
-                                                    <div className="custom-control custom-control-inline custom-control-size mb-2">
-                                                        <input type="radio" className="custom-control-input" name="sizeRadio" id="sizeRadioFive" defaultValue={8} data-toggle="form-caption" data-target="#sizeCaption" />
-                                                        <label className="custom-control-label" htmlFor="sizeRadioFive">8</label>
-                                                    </div>
-                                                    <div className="custom-control custom-control-inline custom-control-size mb-2">
-                                                        <input type="radio" className="custom-control-input" name="sizeRadio" id="sizeRadioSix" defaultValue="8.5" data-toggle="form-caption" data-target="#sizeCaption" />
-                                                        <label className="custom-control-label" htmlFor="sizeRadioSix">8.5</label>
-                                                    </div>
-                                                    <div className="custom-control custom-control-inline custom-control-size mb-2">
-                                                        <input type="radio" className="custom-control-input" name="sizeRadio" id="sizeRadioSeven" defaultValue={9} data-toggle="form-caption" data-target="#sizeCaption" disabled />
-                                                        <label className="custom-control-label" htmlFor="sizeRadioSeven">9</label>
-                                                    </div>
-                                                    <div className="custom-control custom-control-inline custom-control-size mb-2">
-                                                        <input type="radio" className="custom-control-input" name="sizeRadio" id="sizeRadioEight" defaultValue="9.5" data-toggle="form-caption" data-target="#sizeCaption" disabled />
-                                                        <label className="custom-control-label" htmlFor="sizeRadioEight">9.5</label>
-                                                    </div>
-                                                    <div className="custom-control custom-control-inline custom-control-size mb-2">
-                                                        <input type="radio" className="custom-control-input" name="sizeRadio" id="sizeRadioNine" defaultValue={10} data-toggle="form-caption" data-target="#sizeCaption" />
-                                                        <label className="custom-control-label" htmlFor="sizeRadioNine">10</label>
-                                                    </div>
-                                                    <div className="custom-control custom-control-inline custom-control-size mb-2">
-                                                        <input type="radio" className="custom-control-input" name="sizeRadio" id="sizeRadioTen" defaultValue="10.5" data-toggle="form-caption" data-target="#sizeCaption" />
-                                                        <label className="custom-control-label" htmlFor="sizeRadioTen">10.5</label>
-                                                    </div>
-                                                    <div className="custom-control custom-control-inline custom-control-size mb-2">
-                                                        <input type="radio" className="custom-control-input" name="sizeRadio" id="sizeRadioEleven" defaultValue={11} data-toggle="form-caption" data-target="#sizeCaption" />
-                                                        <label className="custom-control-label" htmlFor="sizeRadioEleven">11</label>
-                                                    </div>
-                                                    <div className="custom-control custom-control-inline custom-control-size mb-2">
-                                                        <input type="radio" className="custom-control-input" name="sizeRadio" id="sizeRadioTwelve" defaultValue={12} data-toggle="form-caption" data-target="#sizeCaption" />
-                                                        <label className="custom-control-label" htmlFor="sizeRadioTwelve">12</label>
-                                                    </div>
-                                                    <div className="custom-control custom-control-inline custom-control-size mb-2">
-                                                        <input type="radio" className="custom-control-input" name="sizeRadio" id="sizeRadioThirteen" defaultValue={13} data-toggle="form-caption" data-target="#sizeCaption" />
-                                                        <label className="custom-control-label" htmlFor="sizeRadioThirteen">13</label>
-                                                    </div>
-                                                    <div className="custom-control custom-control-inline custom-control-size mb-2">
-                                                        <input type="radio" className="custom-control-input" name="sizeRadio" id="sizeRadioFourteen" defaultValue={14} data-toggle="form-caption" data-target="#sizeCaption" />
-                                                        <label className="custom-control-label" htmlFor="sizeRadioFourteen">14</label>
-                                                    </div>
-                                                </div>
-                                                {/* Size chart */}
-                                                <p className="mb-8">
-                                                    <img src="./img/icons/icon-ruler.svg" alt="..." className="img-fluid" /> <a className="text-reset text-decoration-underline ml-3" data-toggle="modal" href="#modalSizeChart">Size
-                                                        chart</a>
-                                                </p>
-                                                <div className="form-row mb-7">
-                                                    <div className="col-12 col-lg-auto">
-                                                        {/* Quantity */}
-                                                        <select className="custom-select mb-2">
-                                                            <option value={1} selected>1</option>
-                                                            <option value={2}>2</option>
-                                                            <option value={3}>3</option>
-                                                            <option value={4}>4</option>
-                                                            <option value={5}>5</option>
-                                                        </select>
-                                                    </div>
-                                                    <div className="col-12 col-lg">
-                                                        {/* Submit */}
-                                                        <button type="submit" className="btn btn-block btn-dark mb-2">
-                                                            Add to Cart <i className="fe fe-shopping-cart ml-2" />
-                                                        </button>
-                                                    </div>
-                                                    <div className="col-12 col-lg-auto">
-                                                        {/* Wishlist */}
-                                                        <button className="btn btn-outline-dark btn-block mb-2" data-toggle="button">
-                                                            Wishlist <i className="fe fe-heart ml-2" />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                {/* Text */}
-                                                <p>
-                                                    <span className="text-gray-500">Is your size/color sold out?</span>
-                                                    <a className="text-reset text-decoration-underline" data-toggle="modal" href="#modalWaitList">Join the
-                                                        Wait List!</a>
-                                                </p>
-                                                {/* Share */}
-                                                <p className="mb-0 flex gap-2">
-                                                    <span className="mr-4">Share:</span>
-                                                    <a className="btn btn-xxs btn-circle btn-light font-size-xxxs text-gray-350" href="#!">
-                                                        <i className="fab fa-twitter" />
-                                                    </a>
-                                                    <a className="btn btn-xxs btn-circle btn-light font-size-xxxs text-gray-350" href="#!">
-                                                        <i className="fab fa-facebook-f" />
-                                                    </a>
-                                                    <a className="btn btn-xxs btn-circle btn-light font-size-xxxs text-gray-350" href="#!">
-                                                        <i className="fab fa-pinterest-p" />
-                                                    </a>
-                                                </p>
+                                            <div className="col-12 col-lg-auto">
+                                                {/* Wishlist */}
+                                                <Button outline onClick={onAddWishlist}>
+                                                    Wishlist <i className="fe fe-heart ml-2" />
+                                                </Button>
                                             </div>
-                                        </form>
+                                        </div>
+                                        <p className="mb-0 flex gap-2">
+                                            <span className="mr-4">Share:</span>
+                                            <a className="btn btn-xxs btn-circle btn-light font-size-xxxs text-gray-350" href="#!">
+                                                <i className="fab fa-twitter" />
+                                            </a>
+                                            <a className="btn btn-xxs btn-circle btn-light font-size-xxxs text-gray-350" href="#!">
+                                                <i className="fab fa-facebook-f" />
+                                            </a>
+                                            <a className="btn btn-xxs btn-circle btn-light font-size-xxxs text-gray-350" href="#!">
+                                                <i className="fab fa-pinterest-p" />
+                                            </a>
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </section>
+                    </div >
+                </section >
                 {/* DESCRIPTION */}
-                <section className="pt-11">
+                <section className="pt-11" >
                     <div className="container">
-                        <div className="row">
-                            <div className="col-12">
-                                {/* Nav */}
-                                <div className="nav nav-tabs nav-overflow justify-content-start justify-content-md-center border-bottom">
-                                    <a className="nav-link active" data-toggle="tab" href="#descriptionTab">
-                                        Description
-                                    </a>
-                                    <a className="nav-link" data-toggle="tab" href="#sizeTab">
-                                        Size &amp; Fit
-                                    </a>
-                                    <a className="nav-link" data-toggle="tab" href="#shippingTab">
-                                        Shipping &amp; Return
-                                    </a>
-                                </div>
-                                {/* Content */}
-                                <div className="tab-content">
-                                    <div className="tab-pane fade show active" id="descriptionTab">
-                                        <div className="row justify-content-center py-9">
-                                            <div className="col-12">
-                                                <div className="row">
-                                                    <div className="col-12">
-                                                        {/* Text */}
-                                                        <p className="text-gray-500">
-                                                            Won't herb first male seas, beast. Let upon, female upon third fifth every. Man subdue rule
-                                                            after years herb after
-                                                            form. And image may, morning. Behold in tree day sea that together cattle whose. Fifth gathering
-                                                            brought
-                                                            bearing. Abundantly creeping whose. Beginning form have void two. A whose.
-                                                        </p>
-                                                    </div>
-                                                    <div className="col-12 col-md-6">
-                                                        {/* List */}
-                                                        <ul className="list list-unstyled mb-md-0 text-gray-500">
-                                                            <li>
-                                                                <strong className="text-body">SKU</strong>: #61590437
-                                                            </li>
-                                                            <li>
-                                                                <strong className="text-body">Occasion</strong>: Lifestyle, Sport
-                                                            </li>
-                                                            <li>
-                                                                <strong className="text-body">Country</strong>: Italy
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div className="col-12 col-md-6">
-                                                        {/* List */}
-                                                        <ul className="list list-unstyled mb-0">
-                                                            <li>
-                                                                <strong>Outer</strong>: Leather 100%, Polyamide 100%
-                                                            </li>
-                                                            <li>
-                                                                <strong>Lining</strong>: Polyester 100%
-                                                            </li>
-                                                            <li>
-                                                                <strong>CounSoletry</strong>: Rubber 100%
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                        <Tab removeOnDeActive defaultActive="description">
+                            <div className="row">
+                                <div className="col-12">
+                                    {/* Nav */}
+                                    <div className="nav nav-tabs nav-overflow justify-content-start justify-content-md-center border-bottom">
+                                        <Tab.Title value="description">
+                                            Description
+                                        </Tab.Title>
+                                        <Tab.Title value="size">
+                                            Size &amp; Fit
+                                        </Tab.Title>
+                                        <Tab.Title value="shipping-return">
+                                            Shipping &amp; Return
+                                        </Tab.Title>
                                     </div>
-                                    <div className="tab-pane fade" id="sizeTab">
-                                        <div className="row justify-content-center py-9">
-                                            <div className="col-12">
-                                                <div className="row">
-                                                    <div className="col-12 col-md-6">
-                                                        {/* Text */}
-                                                        <p className="mb-4">
-                                                            <strong>Fitting information:</strong>
-                                                        </p>
-                                                        {/* List */}
-                                                        <ul className="mb-md-0 text-gray-500">
-                                                            <li>
-                                                                Upon seas hath every years have whose
-                                                                subdue creeping they're it were.
-                                                            </li>
-                                                            <li>
-                                                                Make great day bearing.
-                                                            </li>
-                                                            <li>
-                                                                For the moveth is days don't said days.
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div className="col-12 col-md-6">
-                                                        {/* Text */}
-                                                        <p className="mb-4">
-                                                            <strong>Model measurements:</strong>
-                                                        </p>
-                                                        {/* List */}
-                                                        <ul className="list-unstyled text-gray-500">
-                                                            <li>Height: 1.80 m</li>
-                                                            <li>Bust/Chest: 89 cm</li>
-                                                            <li>Hips: 91 cm</li>
-                                                            <li>Waist: 65 cm</li>
-                                                            <li>Model size: M</li>
-                                                        </ul>
-                                                        {/* Size */}
-                                                        <p className="mb-0">
-                                                            <img src="./img/icons/icon-ruler.svg" alt="..." className="img-fluid" />
-                                                            <a className="text-reset text-decoration-underline ml-3" data-toggle="modal" href="#modalSizeChart">Size chart</a>
-                                                        </p>
+                                    {/* Content */}
+                                    <div className="tab-content">
+                                        <Tab.Content value="description">
+                                            <ShortedContent className="py-10" dangerouslySetInnerHTML={{ __html: product.description }} />
+                                        </Tab.Content>
+                                        <Tab.Content value="size">
+                                            <div className="row justify-content-center py-9">
+                                                <div className="col-12">
+                                                    <div className="row">
+                                                        <div className="col-12 col-md-6">
+                                                            {/* Text */}
+                                                            <p className="mb-4">
+                                                                <strong>Fitting information:</strong>
+                                                            </p>
+                                                            {/* List */}
+                                                            <ul className="mb-md-0 text-gray-500">
+                                                                <li>
+                                                                    Upon seas hath every years have whose
+                                                                    subdue creeping they're it were.
+                                                                </li>
+                                                                <li>
+                                                                    Make great day bearing.
+                                                                </li>
+                                                                <li>
+                                                                    For the moveth is days don't said days.
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <div className="col-12 col-md-6">
+                                                            {/* Text */}
+                                                            <p className="mb-4">
+                                                                <strong>Model measurements:</strong>
+                                                            </p>
+                                                            {/* List */}
+                                                            <ul className="list-unstyled text-gray-500">
+                                                                <li>Height: 1.80 m</li>
+                                                                <li>Bust/Chest: 89 cm</li>
+                                                                <li>Hips: 91 cm</li>
+                                                                <li>Waist: 65 cm</li>
+                                                                <li>Model size: M</li>
+                                                            </ul>
+                                                            {/* Size */}
+                                                            <p className="mb-0">
+                                                                <img src="./img/icons/icon-ruler.svg" alt="..." className="img-fluid" />
+                                                                <a className="text-reset text-decoration-underline ml-3" data-toggle="modal" href="#modalSizeChart">Size chart</a>
+                                                            </p>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div className="tab-pane fade" id="shippingTab">
-                                        <div className="row justify-content-center py-9">
-                                            <div className="col-12">
-                                                {/* Table */}
-                                                <div className="table-responsive">
-                                                    <table className="table table-bordered table-sm table-hover">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Shipping Options</th>
-                                                                <th>Delivery Time</th>
-                                                                <th>Price</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td>Standard Shipping</td>
-                                                                <td>Delivery in 5 - 7 working days</td>
-                                                                <td>$8.00</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>Express Shipping</td>
-                                                                <td>Delivery in 3 - 5 working days</td>
-                                                                <td>$12.00</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>1 - 2 day Shipping</td>
-                                                                <td>Delivery in 1 - 2 working days</td>
-                                                                <td>$12.00</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>Free Shipping</td>
-                                                                <td>
-                                                                    Living won't the He one every subdue meat replenish
-                                                                    face was you morning firmament darkness.
-                                                                </td>
-                                                                <td>$0.00</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
+                                        </Tab.Content>
+                                        <Tab.Content value="shipping-return">
+                                            <div className="row justify-content-center py-9">
+                                                <div className="col-12">
+                                                    {/* Table */}
+                                                    <div className="table-responsive">
+                                                        <table className="table table-bordered table-sm table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Shipping Options</th>
+                                                                    <th>Delivery Time</th>
+                                                                    <th>Price</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>Standard Shipping</td>
+                                                                    <td>Delivery in 5 - 7 working days</td>
+                                                                    <td>$8.00</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>Express Shipping</td>
+                                                                    <td>Delivery in 3 - 5 working days</td>
+                                                                    <td>$12.00</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>1 - 2 day Shipping</td>
+                                                                    <td>Delivery in 1 - 2 working days</td>
+                                                                    <td>$12.00</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>Free Shipping</td>
+                                                                    <td>
+                                                                        Living won't the He one every subdue meat replenish
+                                                                        face was you morning firmament darkness.
+                                                                    </td>
+                                                                    <td>$0.00</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    {/* Caption */}
+                                                    <p className="mb-0 text-gray-500">
+                                                        May, life blessed night so creature likeness their, for. <a className="text-body text-decoration-underline" href="#!">Find out more</a>
+                                                    </p>
                                                 </div>
-                                                {/* Caption */}
-                                                <p className="mb-0 text-gray-500">
-                                                    May, life blessed night so creature likeness their, for. <a className="text-body text-decoration-underline" href="#!">Find out more</a>
-                                                </p>
                                             </div>
-                                        </div>
+                                        </Tab.Content>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </Tab>
                     </div>
-                </section>
+                </section >
                 {/* REVIEWS */}
-                <section className="pt-9 pb-11" id="reviews">
+                <section className="pt-9 pb-11" id="reviews" >
                     <div className="container">
                         <div className="row">
                             <div className="col-12">
@@ -661,9 +567,9 @@ export const ProductDetailPage = () => {
                             </div>
                         </div>
                     </div>
-                </section>
+                </section >
                 {/* FEATURES */}
-                <section className="bg-light py-9">
+                <section className="bg-light py-9" >
                     <div className="container">
                         <div className="row">
                             <div className="col-12 col-md-6 col-lg-3">
@@ -740,8 +646,8 @@ export const ProductDetailPage = () => {
                             </div>
                         </div>
                     </div>
-                </section>
-            </div>
+                </section >
+            </div >
 
         </>
     )

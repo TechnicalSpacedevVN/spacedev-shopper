@@ -6,6 +6,9 @@ export const productService = {
     getProduct(query = '', signal) {
         return http.get(`${PRODUCT_API}${query}`, { signal })
     },
+    getProductDetail(id) {
+        return http.get(`${PRODUCT_API}/${id}`)
+    },
     getCategories() {
         return http.get(`${PRODUCT_API}/categories`)
     },
