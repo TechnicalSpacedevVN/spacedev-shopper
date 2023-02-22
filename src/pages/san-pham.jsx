@@ -77,7 +77,7 @@ export const ProductPage = () => {
                                             <ul className="list-styled mb-0" id="productsNav">
 
                                                 {
-                                                    categoryLoading ? Array.from(Array(10)).map((_, i) => (
+                                                    categoryLoading ? Array.from(Array(16)).map((_, i) => (
                                                         <li key={i} className="list-styled-item">
                                                             {/* Toggle */}
                                                             <a className="list-styled-link" href="#">
