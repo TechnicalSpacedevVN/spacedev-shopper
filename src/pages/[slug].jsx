@@ -6,6 +6,7 @@ import { Paginate } from '@/components/Paginate'
 import { Rating } from '@/components/Rating'
 import { ListReview } from '@/components/ReviewItem'
 import { ShortedContent } from '@/components/ShortedContent'
+import { Skeleton } from '@/components/Skeleton'
 import { Tab } from '@/components/Tab'
 import { PATH } from '@/config'
 import { useAction } from '@/hooks/useAction'
@@ -66,7 +67,7 @@ export const ProductDetailPage = () => {
         successMessage: `Thêm sản phẩm "${product?.name}" vào yêu thích thành công`
     })
 
-    if (loading) return null
+    if (loading) return <Loading />
 
 
     const onActiveImageModalCurry = (i) => () => {
@@ -132,12 +133,15 @@ export const ProductDetailPage = () => {
                                         {/* Card */}
                                         <div className="card">
                                             {/* Badge */}
-                                            <div className="badge badge-primary card-badge text-uppercase">
-                                                Sale
-                                            </div>
+                                            {
+                                                product.discount_rate && <div className="badge badge-primary card-badge text-uppercase">
+                                                    -{product.discount_rate} %
+                                                </div>
+                                            }
+
                                             {/* Slider */}
                                             <div className="mb-4">
-                                                <img onClick={onActiveImageModalCurry(0)} src={product.images[0].thumbnail_url} alt="..." className="card-img-top cursor-pointer" />
+                                                <img onClick={onActiveImageModalCurry(0)} src={product.images[0].large_url} alt="..." className="card-img-top cursor-pointer" />
                                             </div>
 
                                             <div style={{ display: 'none' }}>
@@ -148,12 +152,12 @@ export const ProductDetailPage = () => {
                                                         onVisibleChange: vis => setOpenImageModal(vis),
                                                         countRender: (current, total) => `${product.name} - ${current} / ${total}`
                                                     }}>
-                                                    {product.images.map(e => <Image key={e.thumbnail_url} src={e.thumbnail_url} />)}
+                                                    {product.images.map(e => <Image key={e.large_url} src={e.large_url} />)}
                                                 </Image.PreviewGroup>
                                             </div>
                                         </div>
                                         {/* Slider */}
-                                        <div className="flickity-nav mx-n2 mb-10 mb-md-0 flex">
+                                        <div className="flickity-nav mx-n2 mb-10 mb-md-0 flex px-2">
                                             {
                                                 product.images.slice(0, 4).map((e, i) => (
                                                     <div key={e.thumbnail_url} onClick={onActiveImageModalCurry(i)} className="col-12 px-2 cursor-pointer" style={{ maxWidth: 113 }}>
@@ -555,4 +559,75 @@ export const ProductDetailPage = () => {
 
         </>
     )
+}
+
+
+const Loading = () => {
+    return <>
+        <nav className="py-5">
+            <div className="container">
+                <div className="row">
+                    <div className="col-12 flex gap-2">
+                        {/* Breadcrumb */}
+                        <Skeleton height={22} width={37.88} />
+                        <Skeleton height={22} width={93.11} />
+                        <Skeleton height={22} width={300} />
+                    </div>
+                </div>
+            </div>
+        </nav>
+        {/* PRODUCT */}
+        <section>
+            <div className="container pb-40">
+                <div className="row">
+                    <div className="col-12">
+                        <div className="row">
+                            <div className="col-12 col-md-6">
+                                {/* Card */}
+                                <div className="mb-4">
+                                    <Skeleton height={538} width={538} />
+                                </div>
+                                {/* Slider */}
+                                <div className="flickity-nav px-2 mx-n2 mb-10 mb-md-0 flex gap-4">
+                                    <Skeleton height={97} width={97} />
+                                    <Skeleton height={97} width={97} />
+                                    <Skeleton height={97} width={97} />
+                                    <Skeleton height={97} width={97} />
+                                </div>
+                            </div>
+                            <div className="col-12 col-md-6 pl-lg-10">
+                                {/* Header */}
+                                <div className="row mb-1">
+                                    <div className="col">
+                                        <Skeleton width="50%" height={22} />
+                                    </div>
+                                </div>
+                                {/* Heading */}
+                                <h3 className="mb-2">
+                                    <Skeleton width="80%" height={76.78} />
+                                </h3>
+                                {/* Price */}
+                                <div className="mb-7">
+                                    <Skeleton height={32} width="50%" />
+                                    <span className="font-size-sm ml-1"> </span>
+                                </div>
+                                {/* Form */}
+                                <Skeleton height={72} />
+                                <div className="form-row mb-7 mt-3">
+                                    <div className="col-12 col-lg ">
+                                        {/* Submit */}
+                                        <Skeleton height={50.5} />
+                                    </div>
+                                    <div className="col-12 col-lg-auto">
+                                        {/* Wishlist */}
+                                        <Skeleton width={137} height={50.5} />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div >
+        </section >
+    </>
 }
