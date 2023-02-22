@@ -6,11 +6,11 @@ import { authActions } from "../auth";
 
 export function* fetchCartItem(action) {
     try {
+        yield delay(300)
         yield put(cartActions.toggleProductLoading({
             productId: action.payload.productId,
             loading: true
         }))
-        yield delay(300)
         if (action.payload.quantity >= 1) {
             yield call(cartService.addItem, action.payload.productId, action.payload.quantity)
 

@@ -1,4 +1,5 @@
 import { ListProduct } from '@/components/ListProduct'
+import { Promotion } from '@/components/Promotion'
 import { Slider } from '@/components/Slider'
 import { Tab } from '@/components/Tab'
 import React from 'react'
@@ -13,20 +14,7 @@ export const HomePage = () => {
       </Helmet>
       <div>
         {/* PROMO */}
-        <div className="py-3 bg-dark bg-pattern mb-4">
-          <div className="container">
-            <div className="row">
-              <div className="col-12">
-                {/* Text */}
-                <div className="text-center text-white">
-                  <span className="heading-xxs letter-spacing-xl">
-                    ⚡️ Săn deal hot cho ngày lễ 2/9 ⚡️
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Promotion />
         {/* CATEGORIES */}
         <section>
           <div className="row no-gutters d-block d-lg-flex flickity flickity-lg-none" data-flickity="{&quot;watchCSS&quot;: true}">
