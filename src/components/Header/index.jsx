@@ -14,7 +14,7 @@ import { Button } from '../Button'
 import { cartActions } from '@/stores/cart'
 import { useTranslate } from '../TranslateProvider'
 
-const LANG  = {
+const LANG = {
     en: 'English',
     vi: 'Tiếng Việt',
     china: 'China'
@@ -37,7 +37,7 @@ export const Header = () => {
                     <div className="container">
                         {/* Promo */}
                         <div className="mr-xl-8">
-                            <i className="fe fe-truck mr-2" /> <span className="heading-xxxs">Vận chuyển toàn cầu</span>
+                            <i className="fe fe-truck mr-2" /> <span className="heading-xxxs">{t("Global shipping")}</span>
                         </div>
                         {/* Toggler */}
                         <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#topbarCollapse" aria-controls="topbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -105,13 +105,13 @@ export const Header = () => {
                             {/* Nav */}
                             <ul className="nav navbar-nav mr-8">
                                 <li className="nav-item">
-                                    <a className="nav-link" href="./shipping-and-returns.html">Quy định giao hàng</a>
+                                    <a className="nav-link" href="./shipping-and-returns.html">{t("Delivery rules")}</a>
                                 </li>
                                 <li className="nav-item">
-                                    <a className="nav-link" href="./faq.html">Câu hỏi</a>
+                                    <a className="nav-link" href="./faq.html">{t('Question')}</a>
                                 </li>
                                 <li className="nav-item">
-                                    <a className="nav-link" href="./contact-us.html">Liên hệ</a>
+                                    <Link className="nav-link" to={PATH.Contact}>{t('Contact')}</Link>
                                 </li>
                             </ul>
                             {/* Nav */}
@@ -144,10 +144,10 @@ export const Header = () => {
                 <nav className="navbar navbar-expand-lg navbar-light bg-white">
                     <div className="container">
                         {/* Brand */}
-                        <a className="navbar-brand" href="./index.html">
+                        <Link className="navbar-brand" to={PATH.Home}>
                             <img style={{ width: 50 }} src="/img/logo.svg" />
                             Shopper.
-                        </a>
+                        </Link>
                         {/* Toggler */}
                         <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                             <span className="navbar-toggler-icon" />
@@ -162,14 +162,15 @@ export const Header = () => {
                                 <li className="nav-item">
                                     <Link className="nav-link" to={PATH.Product}>{t('Product')}</Link>
                                 </li>
+
                                 <li className="nav-item dropdown">
-                                    <a className="nav-link" href="./shop.html">{t('Laptop')}</a>
+                                    <Link className="nav-link" to="/dien-thoai-may-tinh-bang/1789">{t('Phone')}</Link>
                                 </li>
                                 <li className="nav-item dropdown">
-                                    <a className="nav-link" href="./shop.html">Máy tính</a>
+                                    <Link className="nav-link" to="/laptop-thiet-bi-it/1846">{t('Laptop')}</Link>
                                 </li>
                                 <li className="nav-item">
-                                    <a className="nav-link" href="./shop.html">Sản phẩm khuyến mãi</a>
+                                    <Link className="nav-link" to="/san-pham?page=1&sort=discount_rate.desc">{t('Promotion product')}</Link>
                                 </li>
                             </ul>
                             {/* Nav */}
@@ -193,9 +194,9 @@ export const Header = () => {
                                             dispatch(cartActions.togglePopover(false))
                                         }
                                     }} trigger={['click']} open={openCartOver} placement="bottomRight" content={<>
-                                        <p className="mb-0 flex gap-2 items-center"><span className="text-green-500"><CheckCircleFilled /></span> Thêm sản phẩm vào giỏ hàng thành công</p>
+                                        <p className="mb-0 flex gap-2 items-center"><span className="text-green-500"><CheckCircleFilled /></span> {t('Product added to cart successfully')}</p>
                                         <Link onClick={() => dispatch(cartActions.togglePopover(false))} to={PATH.ViewCart} className="btn btn-dark btn-sm flex items-center justify-center gap-2 w-full btn-xs mt-2">
-                                            Xem giỏ hàng và thanh toán
+                                            {t('View cart and checkout')}
                                         </Link>
                                     </>}>
                                         <a onClick={ev => {
@@ -214,15 +215,15 @@ export const Header = () => {
                                             items: [
                                                 {
                                                     key: 1,
-                                                    label: <Link to={PATH.Profile.Order}>Đơn hàng của tôi</Link>
+                                                    label: <Link to={PATH.Profile.Order}>{t('My order')}</Link>
                                                 },
                                                 {
                                                     key: 2,
-                                                    label: <Link to={PATH.Profile.index}>Thông tin tài khoản</Link>
+                                                    label: <Link to={PATH.Profile.index}>{t('Personal information')}</Link>
                                                 },
                                                 {
                                                     key: 3,
-                                                    label: 'Đăng xuất',
+                                                    label: t('Logout'),
                                                     onClick: () => {
                                                         dispatch(logoutAction())
                                                     }
