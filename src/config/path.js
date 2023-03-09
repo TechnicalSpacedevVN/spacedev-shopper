@@ -9,6 +9,7 @@ export const PATH = {
     Checkout: '/checkout',
     OrderComplete: '/dat-hang-thanh-cong',
     ResetPassword: '/reset-password',
+    Contact: '/lien-he',
     Profile: {
         index: PROFILE,
         Order: PROFILE + '/don-hang',

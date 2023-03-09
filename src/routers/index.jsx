@@ -12,6 +12,7 @@ import { ViewCart } from "@/pages/gio-hang";
 import { Checkout } from "@/pages/checkout";
 import { OrderComplete } from "@/pages/dat-hang-thanh-cong";
 import { ResetPassword } from "@/pages/reset-password";
+import { Contact } from "@/pages/contact";
 
 export const routes = [
     {
@@ -44,7 +45,10 @@ export const routes = [
             {
                 element: <OrderComplete />,
                 path: PATH.OrderComplete,
-                forceRefresh: true
+            },
+            {
+                element: <Contact />,
+                path: PATH.Contact,
             },
             {
                 element: <PrivateRoute redirect={PATH.Account}/>,
